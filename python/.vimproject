@@ -1,0 +1,7 @@
+let w:vimProjectName = "vim-arg-wrap"
+
+set wildignore+=**/__pycache__/**
+nnoremap <leader>t :exe "!pytest -s -p no:cacheprovider"<CR>
+nnoremap <leader>l :exe "!pylint *.py"<CR>
+
+set colorcolumn=100
