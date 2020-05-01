@@ -1,7 +1,6 @@
 from vim import current
 
-from buffer_search import find_args_range
+from args_wrapper import wrap_args
 
 def make_replacement():
-    start, end = find_args_range(current.window.cursor, current.buffer)
-    print('>>', start, end)
+    wrap_args(current.window.cursor, current.buffer)

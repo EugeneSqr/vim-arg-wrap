@@ -1,8 +1,18 @@
-def find_args_range(cursor, buffer):
+def get_args_range(cursor, buffer):
     row_index, col_index = _cursor_to_index(cursor)
     line = buffer[row_index]
-    return (_index_to_cursor((row_index, _search_line_backward(line, '(', col_index))),
-            _index_to_cursor((row_index, _search_line_forward(line, ')', col_index))))
+    return ((row_index, _search_line_backward(line, '(', col_index)),
+            (row_index, _search_line_forward(line, ')', col_index)))
+
+def get_line_indentation(line):
+    indentation = 0
+    if line:
+        for c in line:
+            if c != ' ':
+                break
+            indentation += 1
+
+    return indentation
 
 def _search_line_backward(search_in, search_for, right_index):
     match_index = search_in.rfind(search_for, 0, right_index)
@@ -19,7 +29,3 @@ def _search_line_forward(search_in, search_for, right_index):
 def _cursor_to_index(cursor):
     row, col = cursor
     return row - 1, col
-
-def _index_to_cursor(index):
-    row, col = index
-    return row + 1, col

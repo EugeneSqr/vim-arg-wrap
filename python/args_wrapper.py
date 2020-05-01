@@ -1,12 +1,16 @@
 """
 Converts between wrap types
 Form A: no wrap at all
-def test(a, b, c):
+method_invocation(a, b, c)
 
 Form B: single line wrap
-def test(
+method_invocation(
     a, b, c)
 """
-def a_to_b(lines):
-    print(lines)
-    pass
+
+from buffer_search import get_args_range
+
+def wrap_args(cursor, buffer):
+    (start_row, start_col), (end_row, _) = get_args_range(cursor, buffer)
+    line = buffer[start_row:end_row + 1]
+    buffer.append('aaaa', start_row)
