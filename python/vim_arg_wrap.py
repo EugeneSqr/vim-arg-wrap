@@ -1,6 +1,7 @@
+#pylint:disable=import-error
 from vim import current
 
-from args_wrapper import wrap_args
+import args_wrapper
 
-def make_replacement():
-    wrap_args(current.window.cursor, current.buffer)
+def wrap_args():
+    args_wrapper.wrap_args(current.window.cursor, current.buffer)

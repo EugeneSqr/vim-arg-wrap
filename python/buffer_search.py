@@ -1,30 +1,35 @@
 def get_args_range(cursor, buffer):
     row_index, col_index = _cursor_to_index(cursor)
     line = buffer[row_index]
-    return ((row_index, _search_line_backward(line, '(', col_index)),
-            (row_index, _search_line_forward(line, ')', col_index)))
+    return ((row_index, _find_start_col_index(line, '(', col_index)),
+            (row_index, _find_end_col_index(line, ')', col_index)))
 
-def get_line_indentation(line):
-    indentation = 0
+#pylint:disable=unused-argument
+def get_buffer_indent(buffer):
+    # TODO: replace with proper detection
+    return ' '*4
+
+def get_line_indent(line):
+    indent = 0
     if line:
-        for c in line:
-            if c != ' ':
+        for char in line:
+            if char != ' ':
                 break
-            indentation += 1
+            indent += 1
 
-    return indentation
+    return ' '*indent
 
-def _search_line_backward(search_in, search_for, right_index):
+def _find_start_col_index(search_in, search_for, right_index):
     match_index = search_in.rfind(search_for, 0, right_index)
     if match_index == -1:
         match_index = search_in.find(search_for, right_index, len(search_in))
-    return match_index
+    return match_index + 1
 
-def _search_line_forward(search_in, search_for, right_index):
+def _find_end_col_index(search_in, search_for, right_index):
     match_index = search_in.find(search_for, right_index, len(search_in))
     if match_index == -1:
         match_index = search_in.rfind(')', 0, right_index)
-    return match_index
+    return match_index - 1
 
 def _cursor_to_index(cursor):
     row, col = cursor
