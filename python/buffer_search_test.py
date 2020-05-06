@@ -21,10 +21,10 @@ def test_get_args_range_right(cursor_col):
 
 @pytest.mark.parametrize('empty_line', [None, ''])
 def test_get_indent_empty(empty_line):
-    assert get_line_indent(empty_line) == ''
+    assert get_line_indent(empty_line) == 0
 
 def test_get_indent_0():
-    assert get_line_indent('a    aaa') == ''
+    assert get_line_indent('a    aaa') == 0
 
 def test_get_indent_4():
-    assert get_line_indent('    aa aa') == '    '
+    assert get_line_indent('    aa aa') == 4

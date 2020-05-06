@@ -3,15 +3,14 @@ import args_wrapper
 
 def test_test(monkeypatch):
     _mock_get_args_range(monkeypatch, ((2, 26), (2, 45)))
-    _mock_get_buffer_indent(monkeypatch, ' '*4)
-    _mock_get_line_indent(monkeypatch, ' '*8)
+    _mock_get_line_indent(monkeypatch, 8)
     buffer = _arrange_vim_buffer([
         '    # comment line goes here',
         '    def func():',
         '        method_invocation(first, second, third)',
         '# another comment',
     ])
-    args_wrapper.wrap_args((3, 1), buffer)
+    args_wrapper.ArgsWrapper(4).wrap_args((3, 1), buffer)
     assert buffer == [
         '    # comment line goes here',
         '    def func():',
@@ -28,9 +27,6 @@ def _arrange_vim_buffer(lines):
 
 def _mock_get_args_range(monkeypatch, value):
     _mock_args_wrapper(monkeypatch, 'get_args_range', value)
-
-def _mock_get_buffer_indent(monkeypatch, value):
-    _mock_args_wrapper(monkeypatch, 'get_buffer_indent', value)
 
 def _mock_get_line_indent(monkeypatch, value):
     _mock_args_wrapper(monkeypatch, 'get_line_indent', value)

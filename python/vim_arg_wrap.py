@@ -1,7 +1,8 @@
 #pylint:disable=import-error
-from vim import current
+from vim import current, eval as vim_eval
 
-import args_wrapper
+from args_wrapper import ArgsWrapper
 
 def wrap_args():
-    args_wrapper.wrap_args(current.window.cursor, current.buffer)
+    indent = int(vim_eval('&g:tabstop'))
+    ArgsWrapper(indent).wrap_args(current.window.cursor, current.buffer)

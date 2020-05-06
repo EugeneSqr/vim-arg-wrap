@@ -10,16 +10,20 @@ method_invocation(
 
 from buffer_search import (
     get_args_range,
-    get_buffer_indent,
     get_line_indent,
 )
 
-def wrap_args(cursor, buffer):
-    (start_row, start_col), (end_row, _) = get_args_range(cursor, buffer)
-    line = buffer[start_row:end_row + 1][0]
-    line_indent = get_line_indent(line)
-    buffer_indent = get_buffer_indent(buffer)
-    line_start = line[:start_col]
-    line_end = line_indent + buffer_indent + line[start_col:]
-    buffer[start_row] = line_start
-    buffer.append(line_end, start_row + 1)
+class ArgsWrapper():
+    def __init__(self, indent):
+        self._indent = indent
+
+    def wrap_args(self, cursor, buffer):
+        (start_row, start_col), (end_row, _) = get_args_range(cursor, buffer)
+        line = buffer[start_row:end_row + 1][0]
+        line_start = line[:start_col]
+        line_end = _get_offset(get_line_indent(line)) + _get_offset(self._indent) + line[start_col:]
+        buffer[start_row] = line_start
+        buffer.append(line_end, start_row + 1)
+
+def _get_offset(indent):
+    return ' '*indent

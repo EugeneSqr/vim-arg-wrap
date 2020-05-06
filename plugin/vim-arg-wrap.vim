@@ -2,6 +2,9 @@ if !has('python3')
     echo "Error: Required vim compiled with +python3"
     finish
 endif
+if exists('g:vim_arg_wrap_plugin_loaded')
+    finish
+endif
 let s:plugin_root_dir = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 python3 << EOF
 import sys
@@ -17,3 +20,5 @@ function! WrapArgs()
 endfunction
 
 command! -nargs=0 WrapArgs call WrapArgs()
+
+let g:vim_arg_wrap_plugin_loaded = 1

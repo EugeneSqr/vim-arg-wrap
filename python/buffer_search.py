@@ -4,11 +4,6 @@ def get_args_range(cursor, buffer):
     return ((row_index, _find_start_col_index(line, '(', col_index)),
             (row_index, _find_end_col_index(line, ')', col_index)))
 
-#pylint:disable=unused-argument
-def get_buffer_indent(buffer):
-    # TODO: replace with proper detection
-    return ' '*4
-
 def get_line_indent(line):
     indent = 0
     if line:
@@ -17,7 +12,7 @@ def get_line_indent(line):
                 break
             indent += 1
 
-    return ' '*indent
+    return indent
 
 def _find_start_col_index(search_in, search_for, right_index):
     match_index = search_in.rfind(search_for, 0, right_index)
