@@ -2,6 +2,15 @@ import pytest
 
 from buffer_parser import parse_at_cursor
 
+_FIELD_NAMES = [
+    'start_row_index',
+    'end_row_index',
+    'indent',
+    'beginning',
+    'args',
+    'ending',
+]
+
 def test_parse_at_cursor_single_line_inside_brackets_no_ending():
     '''
     GIVEN function invocation occupies single line
@@ -11,14 +20,9 @@ def test_parse_at_cursor_single_line_inside_brackets_no_ending():
     THEN all the data is extracted successfully
     '''
     buffer = ['this_is_test_function(a, b, c, d)']
-    actual = parse_at_cursor((1, 23), buffer)
-    # TODO: introduce shorter checks
-    assert actual.start_row_index == 0
-    assert actual.end_row_index == 0
-    assert actual.indent == 0
-    assert actual.beginning == 'this_is_test_function('
-    assert actual.args == 'a, b, c, d'
-    assert actual.ending == ')'
+    assert _properties_equal(
+        parse_at_cursor((1, 23), buffer),
+        [0, 0, 0, 'this_is_test_function(', 'a, b, c, d', ')'])
 
 def test_parse_at_cursor_single_line_inside_brackets():
     '''
@@ -29,13 +33,9 @@ def test_parse_at_cursor_single_line_inside_brackets():
     THEN all the data is extracted successfully
     '''
     buffer = ['this_is_test_function(a, b, c, d) #test']
-    actual = parse_at_cursor((1, 23), buffer)
-    assert actual.start_row_index == 0
-    assert actual.end_row_index == 0
-    assert actual.indent == 0
-    assert actual.beginning == 'this_is_test_function('
-    assert actual.args == 'a, b, c, d'
-    assert actual.ending == ') #test'
+    assert _properties_equal(
+        parse_at_cursor((1, 23), buffer),
+        [0, 0, 0, 'this_is_test_function(', 'a, b, c, d', ') #test'])
 
 @pytest.mark.parametrize('cursor_col', [0, 21])
 def test_parse_at_cursor_single_line_left(cursor_col):
@@ -47,13 +47,9 @@ def test_parse_at_cursor_single_line_left(cursor_col):
     THEN all the data is extracted successfully
     '''
     buffer = ['this_is_test_function(a, b, c, d) #test']
-    actual = parse_at_cursor((1, cursor_col), buffer)
-    assert actual.start_row_index == 0
-    assert actual.end_row_index == 0
-    assert actual.indent == 0
-    assert actual.beginning == 'this_is_test_function('
-    assert actual.args == 'a, b, c, d'
-    assert actual.ending == ') #test'
+    assert _properties_equal(
+        parse_at_cursor((1, cursor_col), buffer),
+        [0, 0, 0, 'this_is_test_function(', 'a, b, c, d', ') #test'])
 
 @pytest.mark.parametrize('cursor_col', [36, 32])
 def test_parse_at_cursor_single_line_right(cursor_col):
@@ -65,13 +61,9 @@ def test_parse_at_cursor_single_line_right(cursor_col):
     THEN all the data is extracted successfully
     '''
     buffer = ['this_is_test_function(a, b, c, d) #test']
-    actual = parse_at_cursor((1, cursor_col), buffer)
-    assert actual.start_row_index == 0
-    assert actual.end_row_index == 0
-    assert actual.indent == 0
-    assert actual.beginning == 'this_is_test_function('
-    assert actual.args == 'a, b, c, d'
-    assert actual.ending == ') #test'
+    assert _properties_equal(
+        parse_at_cursor((1, cursor_col), buffer),
+        [0, 0, 0, 'this_is_test_function(', 'a, b, c, d', ') #test'])
 
 def test_parse_at_cursor_single_line_with_indent():
     '''
@@ -83,10 +75,9 @@ def test_parse_at_cursor_single_line_with_indent():
     THEN all the data is extracted successfully
     '''
     buffer = ['   this_is_test_function(a, b, c, d) #test']
-    actual = parse_at_cursor((1, 0), buffer)
-    assert actual.start_row_index == 0
-    assert actual.end_row_index == 0
-    assert actual.indent == 3
-    assert actual.beginning == '   this_is_test_function('
-    assert actual.args == 'a, b, c, d'
-    assert actual.ending == ') #test'
+    assert _properties_equal(
+        parse_at_cursor((1, 0), buffer),
+        [0, 0, 3, '   this_is_test_function(', 'a, b, c, d', ') #test'])
+
+def _properties_equal(actual, expected):
+    return all(actual.__dict__[_FIELD_NAMES[i]] == expected[i] for i in range(len(_FIELD_NAMES)))
