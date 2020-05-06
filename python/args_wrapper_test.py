@@ -1,15 +1,21 @@
 from unittest.mock import Mock
 import args_wrapper
 
-def test_test(monkeypatch):
-    _mock_get_args_range(monkeypatch, ((2, 26), (2, 45)))
-    _mock_get_line_indent(monkeypatch, 8)
+def test_wrap_args(monkeypatch):
     buffer = _arrange_vim_buffer([
         '    # comment line goes here',
         '    def func():',
         '        method_invocation(first, second, third)',
         '# another comment',
     ])
+    _mock_parse_at_cursor(monkeypatch, {
+        'start_row_index': 2,
+        'end_row_index': 2,
+        'indent': 8,
+        'beginning': '        method_invocation(',
+        'args': 'first, second, third',
+        'ending': ')',
+    })
     args_wrapper.ArgsWrapper(4).wrap_args((3, 1), buffer)
     assert buffer == [
         '    # comment line goes here',
@@ -25,14 +31,8 @@ def _arrange_vim_buffer(lines):
         vim_buffer.append(line)
     return vim_buffer
 
-def _mock_get_args_range(monkeypatch, value):
-    _mock_args_wrapper(monkeypatch, 'get_args_range', value)
-
-def _mock_get_line_indent(monkeypatch, value):
-    _mock_args_wrapper(monkeypatch, 'get_line_indent', value)
-
-def _mock_args_wrapper(monkeypatch, name, value):
-    monkeypatch.setattr(args_wrapper, name, Mock(return_value=value))
+def _mock_parse_at_cursor(monkeypatch, values):
+    monkeypatch.setattr(args_wrapper, 'parse_at_cursor', Mock(return_value=type('', (), values)))
 
 class VimBuffer(list):
     """ Vim buffer replacement for testing """

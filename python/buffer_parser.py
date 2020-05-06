@@ -1,10 +1,22 @@
-def get_args_range(cursor, buffer):
+def parse_at_cursor(cursor, buffer):
+    (start_row, start_col), (end_row, end_col) = _get_args_range(cursor, buffer)
+    start_line = buffer[start_row]
+    return type('', (), {
+        'start_row_index': start_row,
+        'end_row_index': end_row,
+        'indent': _get_line_indent(start_line),
+        'beginning': start_line[:start_col],
+        'args': start_line[start_col:end_col + 1],
+        'ending': buffer[end_row][end_col + 1:],
+    })
+
+def _get_args_range(cursor, buffer):
     row_index, col_index = _cursor_to_index(cursor)
     line = buffer[row_index]
     return ((row_index, _find_start_col_index(line, '(', col_index)),
             (row_index, _find_end_col_index(line, ')', col_index)))
 
-def get_line_indent(line):
+def _get_line_indent(line):
     indent = 0
     if line:
         for char in line:
