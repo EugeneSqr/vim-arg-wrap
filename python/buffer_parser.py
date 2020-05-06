@@ -6,7 +6,7 @@ def parse_at_cursor(cursor, buffer):
         'end_row_index': end_row,
         'indent': _get_line_indent(start_line),
         'beginning': start_line[:start_col],
-        'args': start_line[start_col:end_col + 1],
+        'args': _parse_args_string(start_line[start_col:end_col + 1]),
         'ending': buffer[end_row][end_col + 1:],
     })
 
@@ -16,15 +16,9 @@ def _get_args_range(cursor, buffer):
     return ((row_index, _find_start_col_index(line, '(', col_index)),
             (row_index, _find_end_col_index(line, ')', col_index)))
 
-def _get_line_indent(line):
-    indent = 0
-    if line:
-        for char in line:
-            if char != ' ':
-                break
-            indent += 1
-
-    return indent
+def _cursor_to_index(cursor):
+    row, col = cursor
+    return row - 1, col
 
 def _find_start_col_index(search_in, search_for, right_index):
     match_index = search_in.rfind(search_for, 0, right_index)
@@ -38,6 +32,15 @@ def _find_end_col_index(search_in, search_for, right_index):
         match_index = search_in.rfind(')', 0, right_index)
     return match_index - 1
 
-def _cursor_to_index(cursor):
-    row, col = cursor
-    return row - 1, col
+def _get_line_indent(line):
+    indent = 0
+    if line:
+        for char in line:
+            if char != ' ':
+                break
+            indent += 1
+
+    return indent
+
+def _parse_args_string(args):
+    return list(map(str.strip, args.split(',')))

@@ -22,7 +22,7 @@ def test_parse_at_cursor_single_line_inside_brackets_no_ending():
     buffer = ['this_is_test_function(a, b, c, d)']
     assert _properties_equal(
         parse_at_cursor((1, 23), buffer),
-        [0, 0, 0, 'this_is_test_function(', 'a, b, c, d', ')'])
+        [0, 0, 0, 'this_is_test_function(', ['a', 'b', 'c', 'd'], ')'])
 
 def test_parse_at_cursor_single_line_inside_brackets():
     '''
@@ -35,7 +35,7 @@ def test_parse_at_cursor_single_line_inside_brackets():
     buffer = ['this_is_test_function(a, b, c, d) #test']
     assert _properties_equal(
         parse_at_cursor((1, 23), buffer),
-        [0, 0, 0, 'this_is_test_function(', 'a, b, c, d', ') #test'])
+        [0, 0, 0, 'this_is_test_function(', ['a', 'b', 'c', 'd'], ') #test'])
 
 @pytest.mark.parametrize('cursor_col', [0, 21])
 def test_parse_at_cursor_single_line_left(cursor_col):
@@ -49,7 +49,7 @@ def test_parse_at_cursor_single_line_left(cursor_col):
     buffer = ['this_is_test_function(a, b, c, d) #test']
     assert _properties_equal(
         parse_at_cursor((1, cursor_col), buffer),
-        [0, 0, 0, 'this_is_test_function(', 'a, b, c, d', ') #test'])
+        [0, 0, 0, 'this_is_test_function(', ['a', 'b', 'c', 'd'], ') #test'])
 
 @pytest.mark.parametrize('cursor_col', [36, 32])
 def test_parse_at_cursor_single_line_right(cursor_col):
@@ -63,7 +63,7 @@ def test_parse_at_cursor_single_line_right(cursor_col):
     buffer = ['this_is_test_function(a, b, c, d) #test']
     assert _properties_equal(
         parse_at_cursor((1, cursor_col), buffer),
-        [0, 0, 0, 'this_is_test_function(', 'a, b, c, d', ') #test'])
+        [0, 0, 0, 'this_is_test_function(', ['a', 'b', 'c', 'd'], ') #test'])
 
 def test_parse_at_cursor_single_line_with_indent():
     '''
@@ -77,7 +77,7 @@ def test_parse_at_cursor_single_line_with_indent():
     buffer = ['   this_is_test_function(a, b, c, d) #test']
     assert _properties_equal(
         parse_at_cursor((1, 0), buffer),
-        [0, 0, 3, '   this_is_test_function(', 'a, b, c, d', ') #test'])
+        [0, 0, 3, '   this_is_test_function(', ['a', 'b', 'c', 'd'], ') #test'])
 
 def _properties_equal(actual, expected):
     return all(actual.__dict__[_FIELD_NAMES[i]] == expected[i] for i in range(len(_FIELD_NAMES)))

@@ -13,7 +13,7 @@ def test_wrap_args(monkeypatch):
         'end_row_index': 2,
         'indent': 8,
         'beginning': '        method_invocation(',
-        'args': 'first, second, third',
+        'args': ['first', 'second', 'third'],
         'ending': ')',
     })
     args_wrapper.ArgsWrapper(4).wrap_args((3, 1), buffer)
