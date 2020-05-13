@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class ArgsWrapperBase(ABC):
+class ArgWrapperBase(ABC):
     def __init__(self, indent):
         self._next_wrapper = None
         self._indent = indent

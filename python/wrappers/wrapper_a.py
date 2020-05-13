@@ -1,8 +1,8 @@
 from buffer_parser import parse_at_cursor
 
-from .wrapper_base import ArgsWrapperBase
+from .wrapper_base import ArgWrapperBase
 
-class ArgsWrapperA(ArgsWrapperBase):
+class ArgWrapperA(ArgWrapperBase):
     # TODO: fix description, move types to different files
     """
     Converts between wrap types

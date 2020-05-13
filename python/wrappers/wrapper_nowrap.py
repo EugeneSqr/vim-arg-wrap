@@ -1,7 +1,7 @@
-from .wrapper_base import ArgsWrapperBase
+from .wrapper_base import ArgWrapperBase
 
 # TODO: add unit tests
-class ArgsWrapperNoWrap(ArgsWrapperBase):
+class ArgWrapperNoWrap(ArgWrapperBase):
     """
     Converts block of text to its unwrapped form.
     invoke_method(

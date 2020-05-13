@@ -16,7 +16,7 @@ def test_wrap_args(monkeypatch):
         'args': ['first', 'second', 'third'],
         'ending': ')',
     })
-    wrapper_a.ArgsWrapperA(4).wrap_args((3, 1), buffer)
+    wrapper_a.ArgWrapperA(4).wrap_args((3, 1), buffer)
     assert buffer == [
         '    # comment line goes here',
         '    def func():',
