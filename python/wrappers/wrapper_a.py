@@ -14,6 +14,7 @@ class ArgsWrapperA(ArgsWrapperBase):
         a, b, c)
     """
     def _wrap_args(self, cursor, buffer):
+        print('wrap args from A')
         parsed_range = parse_at_cursor(cursor, buffer)
         first_line = parsed_range.beginning
         second_line = (_get_offset(parsed_range.indent) + _get_offset(self._indent) +
@@ -21,7 +22,7 @@ class ArgsWrapperA(ArgsWrapperBase):
         buffer[parsed_range.start_row_index] = first_line
         buffer.append(second_line, parsed_range.start_row_index + 1)
     def _can_wrap(self, cursor, buffer):
-        # TODO: add proper implementation
+        # TODO: proper implementation
         return True
 
 def _get_offset(indent):
