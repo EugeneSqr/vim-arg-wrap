@@ -15,73 +15,51 @@ _FIELD_NAMES = [
     'ending',
 ]
 
-def test_parse_at_cursor_single_line_inside_brackets_no_ending():
+@pytest.mark.parametrize('text_ending', ['', ' #test'])
+def test_parse_at_cursor_single_line_inside_brackets_ending(text_ending):
     '''
     GIVEN function invocation occupies single line
-    AND no extra text is present at the end
-    AND cursor position is inside the brackets
+    AND ending text is of varied length
+    AND cursor position is inside brackets
     WHEN parsing the buffer range
-    THEN all the data is extracted successfully
+    THEN the data is extracted correctly
     '''
-    buffer = ['this_is_test_function(a, b, c, d)']
+    buffer = ['this_is_test_function(a, b, c, d)' + text_ending]
     assert _properties_equal(
         parse_at_cursor((1, 23), buffer),
-        [0, 0, 0, 'this_is_test_function(', ['a', 'b', 'c', 'd'], ')'])
+        [0, 0, 0, 'this_is_test_function(', ['a', 'b', 'c', 'd'], ')' + text_ending])
 
-def test_parse_at_cursor_single_line_inside_brackets():
+@pytest.mark.parametrize(
+    ['offset', 'text_beginning'],
+    [('', ''), ('    ', 'test'), ('  ', '')])
+def test_parse_at_cursor_single_line_inside_brackets_beginning(offset, text_beginning):
+    '''
+    GIVEN function invocation occupies single line
+    AND beginning text is of varied length
+    AND offset is of varied length
+    AND cursor position is inside brackets
+    WHEN parsing the buffer range
+    THEN the data is extracted correctly
+    '''
+    buffer = [offset + text_beginning + '(a, b, c, d)']
+    assert _properties_equal(
+        parse_at_cursor((1, len(offset) + len(text_beginning) + 1, ), buffer),
+        [0, 0, len(offset), offset + text_beginning + '(', ['a', 'b', 'c', 'd'], ')'])
+
+@pytest.mark.parametrize('cursor_col', [0, 21, 23, 32, 36])
+def test_parse_at_cursor_single_line_cursor_positions(cursor_col):
     '''
     GIVEN function invocation occupies single line
     AND some text is present at the end
-    AND cursor position is inside the brackets
+    AND cursor position varies from left to right
     WHEN parsing the buffer range
-    THEN all the data is extracted successfully
-    '''
-    buffer = ['this_is_test_function(a, b, c, d) #test']
-    assert _properties_equal(
-        parse_at_cursor((1, 23), buffer),
-        [0, 0, 0, 'this_is_test_function(', ['a', 'b', 'c', 'd'], ') #test'])
-
-@pytest.mark.parametrize('cursor_col', [0, 21])
-def test_parse_at_cursor_single_line_left(cursor_col):
-    '''
-    GIVEN function invocation occupies single line
-    AND some text is present at the end
-    AND cursor position is to the left of the opening bracket
-    WHEN parsing the buffer range
-    THEN all the data is extracted successfully
+    THEN the data is extracted correctly
+    AND result does not depend on cursor position
     '''
     buffer = ['this_is_test_function(a, b, c, d) #test']
     assert _properties_equal(
         parse_at_cursor((1, cursor_col), buffer),
         [0, 0, 0, 'this_is_test_function(', ['a', 'b', 'c', 'd'], ') #test'])
-
-@pytest.mark.parametrize('cursor_col', [36, 32])
-def test_parse_at_cursor_single_line_right(cursor_col):
-    '''
-    GIVEN function invocation occupies single line
-    AND some text is present at the end
-    AND cursor position is to the right of the opening bracket
-    WHEN parsing the buffer range
-    THEN all the data is extracted successfully
-    '''
-    buffer = ['this_is_test_function(a, b, c, d) #test']
-    assert _properties_equal(
-        parse_at_cursor((1, cursor_col), buffer),
-        [0, 0, 0, 'this_is_test_function(', ['a', 'b', 'c', 'd'], ') #test'])
-
-def test_parse_at_cursor_single_line_with_indent():
-    '''
-    GIVEN function invocation occupies single line
-    AND some text is present at the end
-    AND cursor position at the beginning of the line
-    AND line has non zero indentation
-    WHEN parsing the buffer range
-    THEN all the data is extracted successfully
-    '''
-    buffer = ['   this_is_test_function(a, b, c, d) #test']
-    assert _properties_equal(
-        parse_at_cursor((1, 0), buffer),
-        [0, 0, 3, '   this_is_test_function(', ['a', 'b', 'c', 'd'], ') #test'])
 
 # # TODO: THE TESTS BELOW ARE TEMPORARY
 # def test_temp_last_bracket_index_1():
