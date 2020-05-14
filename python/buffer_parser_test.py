@@ -83,109 +83,109 @@ def test_parse_at_cursor_single_line_with_indent():
         parse_at_cursor((1, 0), buffer),
         [0, 0, 3, '   this_is_test_function(', ['a', 'b', 'c', 'd'], ') #test'])
 
-# TODO: THE TESTS BELOW ARE TEMPORARY
-def test_temp_last_bracket_index_1():
-    buffer = ['test((a + b), c)']
-    actual = _get_last_closing_bracket_index((1, 0), buffer)
-    assert actual == (0, 15)
-
-def test_temp_last_bracket_index_2():
-    buffer = ['test((a + b), c) # comment']
-    actual = _get_last_closing_bracket_index((1, 0), buffer)
-    assert actual == (0, 15)
-
-@pytest.mark.parametrize('cursor_row', [1, 2])
-def test_temp_last_bracket_index_3(cursor_row):
-    buffer = [
-        'test(',
-        '    (a + b), c)',
-    ]
-    actual = _get_last_closing_bracket_index((cursor_row, 0), buffer)
-    assert actual == (1, 14)
-
-@pytest.mark.parametrize('cursor_row', [1, 2])
-def test_temp_last_bracket_index_4(cursor_row):
-    buffer = [
-        'test( # comment',
-        '    (a + b), c) # comment, a, b, c',
-    ]
-    actual = _get_last_closing_bracket_index((cursor_row, 0), buffer)
-    assert actual == (1, 14)
-
-@pytest.mark.parametrize('cursor_row', [1, 2, 3])
-def test_temp_last_bracket_index_5(cursor_row):
-    buffer = [
-        'test((a + b), # comment',
-        '    b + c,',
-        '    (c)) # comment',
-    ]
-    actual = _get_last_closing_bracket_index((cursor_row, 0), buffer)
-    assert actual == (2, 7)
-
-def test_temp_last_bracket_index_6():
-    buffer = ['test(']
-    assert _get_last_closing_bracket_index((1, 0), buffer) is None
-
-def test_temp_last_bracket_index_7():
-    buffer = [
-        'test(',
-        '    a, b, c'
-    ]
-    assert _get_last_closing_bracket_index((1, 0), buffer) is None
-
-def test_temp_first_bracket_index_1():
-    buffer = ['test((a + b), c)']
-    actual = _get_first_opening_bracket_index((0, 15), buffer)
-    assert actual == (0, 4)
-
-def test_temp_first_bracket_index_2():
-    buffer = ['test((a + b), c) # comment']
-    actual = _get_first_opening_bracket_index((0, 15), buffer)
-    assert actual == (0, 4)
-
-def test_temp_first_bracket_index_3():
-    buffer = [
-        'test(',
-        '    (a + b), c)',
-    ]
-    actual = _get_first_opening_bracket_index((1, 14), buffer)
-    assert actual == (0, 4)
-
-def test_temp_first_bracket_index_4():
-    buffer = [
-        'test( # comment',
-        '    (a + b), c) # comment, a, b, c',
-    ]
-    actual = _get_first_opening_bracket_index((1, 14), buffer)
-    assert actual == (0, 4)
-
-def test_temp_first_bracket_index_5():
-    buffer = [
-        'test((a + b), # comment',
-        '    b + c,',
-        '    (c)) # comment',
-    ]
-    actual = _get_first_opening_bracket_index((2, 7), buffer)
-    assert actual == (0, 4)
-
-def test_temp_first_bracket_index_6():
-    buffer = ['test(']
-    assert _get_first_opening_bracket_index(None, buffer) is None
-
-def test_temp_first_bracket_index_7():
-    buffer = [
-        'test(',
-        '    a, b, c'
-    ]
-    assert _get_first_opening_bracket_index(None, buffer) is None
-
-def test_temp_first_bracket_index_8():
-    buffer = [
-        'test(a + b), # comment',
-        '    b + c,',
-        '    (c)) # comment',
-    ]
-    assert _get_first_opening_bracket_index((2, 7), buffer) is None
+# # TODO: THE TESTS BELOW ARE TEMPORARY
+# def test_temp_last_bracket_index_1():
+#     buffer = ['test((a + b), c)']
+#     actual = _get_last_closing_bracket_index((1, 0), buffer)
+#     assert actual == (0, 15)
+#
+# def test_temp_last_bracket_index_2():
+#     buffer = ['test((a + b), c) # comment']
+#     actual = _get_last_closing_bracket_index((1, 0), buffer)
+#     assert actual == (0, 15)
+#
+# @pytest.mark.parametrize('cursor_row', [1, 2])
+# def test_temp_last_bracket_index_3(cursor_row):
+#     buffer = [
+#         'test(',
+#         '    (a + b), c)',
+#     ]
+#     actual = _get_last_closing_bracket_index((cursor_row, 0), buffer)
+#     assert actual == (1, 14)
+#
+# @pytest.mark.parametrize('cursor_row', [1, 2])
+# def test_temp_last_bracket_index_4(cursor_row):
+#     buffer = [
+#         'test( # comment',
+#         '    (a + b), c) # comment, a, b, c',
+#     ]
+#     actual = _get_last_closing_bracket_index((cursor_row, 0), buffer)
+#     assert actual == (1, 14)
+#
+# @pytest.mark.parametrize('cursor_row', [1, 2, 3])
+# def test_temp_last_bracket_index_5(cursor_row):
+#     buffer = [
+#         'test((a + b), # comment',
+#         '    b + c,',
+#         '    (c)) # comment',
+#     ]
+#     actual = _get_last_closing_bracket_index((cursor_row, 0), buffer)
+#     assert actual == (2, 7)
+#
+# def test_temp_last_bracket_index_6():
+#     buffer = ['test(']
+#     assert _get_last_closing_bracket_index((1, 0), buffer) is None
+#
+# def test_temp_last_bracket_index_7():
+#     buffer = [
+#         'test(',
+#         '    a, b, c'
+#     ]
+#     assert _get_last_closing_bracket_index((1, 0), buffer) is None
+#
+# def test_temp_first_bracket_index_1():
+#     buffer = ['test((a + b), c)']
+#     actual = _get_first_opening_bracket_index((0, 15), buffer)
+#     assert actual == (0, 4)
+#
+# def test_temp_first_bracket_index_2():
+#     buffer = ['test((a + b), c) # comment']
+#     actual = _get_first_opening_bracket_index((0, 15), buffer)
+#     assert actual == (0, 4)
+#
+# def test_temp_first_bracket_index_3():
+#     buffer = [
+#         'test(',
+#         '    (a + b), c)',
+#     ]
+#     actual = _get_first_opening_bracket_index((1, 14), buffer)
+#     assert actual == (0, 4)
+#
+# def test_temp_first_bracket_index_4():
+#     buffer = [
+#         'test( # comment',
+#         '    (a + b), c) # comment, a, b, c',
+#     ]
+#     actual = _get_first_opening_bracket_index((1, 14), buffer)
+#     assert actual == (0, 4)
+#
+# def test_temp_first_bracket_index_5():
+#     buffer = [
+#         'test((a + b), # comment',
+#         '    b + c,',
+#         '    (c)) # comment',
+#     ]
+#     actual = _get_first_opening_bracket_index((2, 7), buffer)
+#     assert actual == (0, 4)
+#
+# def test_temp_first_bracket_index_6():
+#     buffer = ['test(']
+#     assert _get_first_opening_bracket_index(None, buffer) is None
+#
+# def test_temp_first_bracket_index_7():
+#     buffer = [
+#         'test(',
+#         '    a, b, c'
+#     ]
+#     assert _get_first_opening_bracket_index(None, buffer) is None
+#
+# def test_temp_first_bracket_index_8():
+#     buffer = [
+#         'test(a + b), # comment',
+#         '    b + c,',
+#         '    (c)) # comment',
+#     ]
+#     assert _get_first_opening_bracket_index((2, 7), buffer) is None
 
 def _properties_equal(actual, expected):
     return all(actual.__dict__[_FIELD_NAMES[i]] == expected[i] for i in range(len(_FIELD_NAMES)))
