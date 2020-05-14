@@ -6,7 +6,7 @@ def parse_at_cursor(cursor, buffer):
         'end_row_index': end_row,
         'indent': _get_line_indent(start_line),
         'beginning': start_line[:start_col + 1],
-        'args': _parse_args_string(start_line[start_col + 1:end_col]),
+        'args': _get_args(start_line[start_col + 1:end_col]),
         'ending': buffer[end_row][end_col:],
     })
 
@@ -69,5 +69,15 @@ def _get_line_indent(line):
 
     return indent
 
-def _parse_args_string(args):
+def _get_args(args):
     return list(map(str.strip, args.split(',')))
+
+def _get_args2(opening_bracket_index, closing_bracket_index, buffer):
+    start_row, start_col = opening_bracket_index
+    end_row, end_col = closing_bracket_index
+    buffer_range_len = sum(len(buffer[index]) for index in range(start_row, end_row + 1))
+    beginning_len = start_col + 1
+    ending_len = len(buffer[end_row]) - end_col
+    arg_len = buffer_range_len - beginning_len - ending_len
+    arg_string = ''.join(buffer[start_row:end_row + 1])[start_col + 1:start_col + 1 + args_len]
+    return list(map(str.strip, arg_string.split(',')))

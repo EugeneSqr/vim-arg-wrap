@@ -61,6 +61,11 @@ def test_parse_at_cursor_single_line_cursor_positions(cursor_col):
         parse_at_cursor((1, cursor_col), buffer),
         [0, 0, 0, 'this_is_test_function(', ['a', 'b', 'c', 'd'], ') #test'])
 
+# TODO: add two lines tests similar to single line
+# TODO: add multiple lines tests (2 types with or without offset)
+# TODO: add temp tests for _get_args2
+
+
 # # TODO: THE TESTS BELOW ARE TEMPORARY
 # def test_temp_last_bracket_index_1():
 #     buffer = ['test((a + b), c)']
