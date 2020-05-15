@@ -1,16 +1,22 @@
 def parse_at_cursor(cursor, buffer):
-    (start_row, start_col), (end_row, end_col) = _get_args_range(cursor, buffer)
-    start_line = buffer[start_row]
+    # TODO: add empty range checks with tests
+    (start_row, start_col), (end_row, end_col) = _get_arg_range(cursor, buffer)
+    beginning = buffer[start_row][:start_col + 1]
+    ending = buffer[end_row][end_col:]
+    buffer_range_len = sum(len(buffer[index]) for index in range(start_row, end_row + 1))
+    arg_line_start = start_col + 1
+    arg_line_len = buffer_range_len - len(beginning) - len(ending)
+    arg_line = ''.join(buffer[start_row:end_row + 1])[arg_line_start:arg_line_start + arg_line_len]
     return type('', (), {
         'start_row_index': start_row,
         'end_row_index': end_row,
-        'indent': _get_line_indent(start_line),
-        'beginning': start_line[:start_col + 1],
-        'args': _get_args(start_line[start_col + 1:end_col]),
-        'ending': buffer[end_row][end_col:],
+        'indent': _get_line_indent(buffer[start_row]),
+        'beginning': beginning,
+        'args': _line_to_args(arg_line),
+        'ending': ending,
     })
 
-def _get_args_range(cursor, buffer):
+def _get_arg_range(cursor, buffer):
     last_bracket_index = _get_last_closing_bracket_index(cursor, buffer)
     return _get_first_opening_bracket_index(last_bracket_index, buffer), last_bracket_index
 
@@ -69,15 +75,5 @@ def _get_line_indent(line):
 
     return indent
 
-def _get_args(args):
+def _line_to_args(args):
     return list(map(str.strip, args.split(',')))
-
-def _get_args2(opening_bracket_index, closing_bracket_index, buffer):
-    start_row, start_col = opening_bracket_index
-    end_row, end_col = closing_bracket_index
-    buffer_range_len = sum(len(buffer[index]) for index in range(start_row, end_row + 1))
-    beginning_len = start_col + 1
-    ending_len = len(buffer[end_row]) - end_col
-    arg_len = buffer_range_len - beginning_len - ending_len
-    arg_string = ''.join(buffer[start_row:end_row + 1])[start_col + 1:start_col + 1 + args_len]
-    return list(map(str.strip, arg_string.split(',')))
