@@ -12,7 +12,3 @@ class ArgWrapperA(ArgWrapperBase):
                        ', '.join(parsed_range.args) + parsed_range.ending)
         buffer[parsed_range.start_row_index] = first_line
         buffer.append(second_line, parsed_range.start_row_index + 1)
-
-    def _can_wrap(self, parsed_range):
-        # TODO: proper implementation
-        return True

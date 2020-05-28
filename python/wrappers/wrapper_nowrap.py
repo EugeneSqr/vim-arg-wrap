@@ -11,7 +11,3 @@ class ArgWrapperNoWrap(ArgWrapperBase):
         print('Wrap Args from nowrap')
         # TODO: implement me
         # pass
-
-    def _can_wrap(self, parsed_range):
-        # TODO: proper implementation
-        return True
