@@ -15,6 +15,26 @@ _FIELD_NAMES = [
     'ending',
 ]
 
+def test_parse_at_cursor_no_opening_bracket():
+    '''
+    GIVEN function invocation occupies single line
+    AND opening bracket is absent
+    WHEN parsing the buffer range
+    THEN empty parsed range is returned
+    '''
+    buffer = ['test)']
+    assert parse_at_cursor((1, 0), buffer) is None
+
+def test_parse_at_cursor_no_closing_bracket():
+    '''
+    GIVEN function invocation occupies single line
+    AND closing bracket is absent
+    WHEN parsing the buffer range
+    THEN empty parsed range is returned
+    '''
+    buffer = ['test(']
+    assert parse_at_cursor((1, 0), buffer) is None
+
 @pytest.mark.parametrize(
     ['offset', 'text_beginning'],
     [('', ''), ('    ', 'test'), ('  ', '')])

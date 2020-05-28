@@ -1,6 +1,8 @@
 def parse_at_cursor(cursor, buffer):
-    # TODO: add empty range checks with tests
-    (start_row, start_col), (end_row, end_col) = _get_arg_range(cursor, buffer)
+    arg_range = _get_arg_range(cursor, buffer)
+    if not arg_range:
+        return None
+    (start_row, start_col), (end_row, end_col) = arg_range
     beginning = buffer[start_row][:start_col + 1]
     ending = buffer[end_row][end_col:]
     buffer_range_len = sum(len(buffer[index]) for index in range(start_row, end_row + 1))
@@ -18,7 +20,12 @@ def parse_at_cursor(cursor, buffer):
 
 def _get_arg_range(cursor, buffer):
     last_bracket_index = _get_last_closing_bracket_index(cursor, buffer)
-    return _get_first_opening_bracket_index(last_bracket_index, buffer), last_bracket_index
+    if not last_bracket_index:
+        return None
+    first_bracket_index = _get_first_opening_bracket_index(last_bracket_index, buffer)
+    if not first_bracket_index:
+        return None
+    return first_bracket_index, last_bracket_index
 
 def _cursor_to_index(cursor):
     row, col = cursor
