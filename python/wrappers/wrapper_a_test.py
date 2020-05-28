@@ -1,5 +1,5 @@
 from unittest.mock import Mock
-from . import wrapper_a
+from . import wrapper_a, wrapper_base
 
 def test_wrap_args(monkeypatch):
     buffer = _arrange_vim_buffer([
@@ -16,7 +16,8 @@ def test_wrap_args(monkeypatch):
         'args': ['first', 'second', 'third'],
         'ending': ')',
     })
-    wrapper_a.ArgWrapperA(4).wrap_args((3, 1), buffer)
+    arg_wrapper = wrapper_a.ArgWrapperA(4)
+    arg_wrapper.wrap_args((3, 1), buffer)
     assert buffer == [
         '    # comment line goes here',
         '    def func():',
@@ -32,7 +33,7 @@ def _arrange_vim_buffer(lines):
     return vim_buffer
 
 def _mock_parse_at_cursor(monkeypatch, values):
-    monkeypatch.setattr(wrapper_a, 'parse_at_cursor', Mock(return_value=type('', (), values)))
+    monkeypatch.setattr(wrapper_base, 'parse_at_cursor', Mock(return_value=type('', (), values)))
 
 class VimBuffer(list):
     """ Vim buffer replacement for testing """
