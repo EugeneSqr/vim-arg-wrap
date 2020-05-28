@@ -9,7 +9,7 @@ from buffer_parser import (
 _FIELD_NAMES = [
     'start_row_index',
     'end_row_index',
-    'indent',
+    'start_row_indent',
     'beginning',
     'args',
     'ending',

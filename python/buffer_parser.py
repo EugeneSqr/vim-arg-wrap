@@ -10,8 +10,7 @@ def parse_at_cursor(cursor, buffer):
     return type('', (), {
         'start_row_index': start_row,
         'end_row_index': end_row,
-        # TODO: rename to start_row_indent
-        'indent': _get_line_indent(buffer[start_row]),
+        'start_row_indent': _get_line_indent(buffer[start_row]),
         'beginning': beginning,
         'args': _line_to_args(arg_line),
         'ending': ending,

@@ -8,7 +8,7 @@ def test_wrap_args(arrange_vim_buffer, mock_parse_at_cursor):
         '# a comment',
     ])
     mock_parse_at_cursor({
-        'start_row_index': 2, 'end_row_index': 2, 'indent': 8,
+        'start_row_index': 2, 'end_row_index': 2, 'start_row_indent': 8,
         'beginning': '        a_method(',
         'args': ['a_a', 'a_b', 'a_c'],
         'ending': ')',

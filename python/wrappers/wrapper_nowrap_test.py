@@ -8,7 +8,7 @@ def test_wrap_args_single_line(arrange_vim_buffer, mock_parse_at_cursor):
         '# nowrap comment',
     ])
     mock_parse_at_cursor({
-        'start_row_index': 2, 'end_row_index': 2, 'indent': 6,
+        'start_row_index': 2, 'end_row_index': 2, 'start_row_indent': 6,
         'beginning': '      nowrap_method(',
         'args': ['no_wrap_a', 'nowrap_b', 'no_wrap_c'],
         'ending': ')',
@@ -30,7 +30,7 @@ def test_wrap_args_two_lines(arrange_vim_buffer, mock_parse_at_cursor):
         '# nowrap comment',
     ])
     mock_parse_at_cursor({
-        'start_row_index': 2, 'end_row_index': 3, 'indent': 8,
+        'start_row_index': 2, 'end_row_index': 3, 'start_row_indent': 8,
         'beginning': '        nowrap_method(',
         'args': ['no_wrap_a', 'nowrap_b', 'no_wrap_c'],
         'ending': ')',
@@ -54,7 +54,7 @@ def test_wrap_args_multiple_lines(arrange_vim_buffer, mock_parse_at_cursor):
         '# nowrap comment',
     ])
     mock_parse_at_cursor({
-        'start_row_index': 2, 'end_row_index': 5, 'indent': 8,
+        'start_row_index': 2, 'end_row_index': 5, 'start_row_indent': 8,
         'beginning': '        nowrap_method(',
         'args': ['no_wrap_a', 'nowrap_b', 'no_wrap_c'],
         'ending': ')',
@@ -77,7 +77,7 @@ def test_wrap_args_multiple_lines_below_first(arrange_vim_buffer, mock_parse_at_
         '# nowrap comment',
     ])
     mock_parse_at_cursor({
-        'start_row_index': 2, 'end_row_index': 4, 'indent': 8,
+        'start_row_index': 2, 'end_row_index': 4, 'start_row_indent': 8,
         'beginning': '        nowrap_method(',
         'args': ['no_wrap_a', 'nowrap_b', 'no_wrap_c'],
         'ending': ')',
