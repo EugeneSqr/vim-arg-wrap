@@ -1,6 +1,5 @@
 from .wrapper_base import ArgWrapperBase
 
-# TODO: add unit tests
 class ArgWrapperNoWrap(ArgWrapperBase):
     """
     Converts block of text to its nowrapped form:
