@@ -19,12 +19,12 @@ class ArgWrapperBase(ABC):
 
     @abstractmethod
     def _wrap_args(self, cursor, buffer):
-        raise NotImplementedError("You should implement this method.")
+        raise NotImplementedError('You should implement this method.')
 
     @abstractmethod
     def _can_wrap(self, cursor, buffer):
         # TODO: accept parsed_range instead of cursor and buffer
-        raise NotImplementedError("You should implement this method.")
+        raise NotImplementedError('You should implement this method.')
 
     def _get_next_wrapper(self):
         return self._next_wrapper
