@@ -15,6 +15,10 @@ class ArgWrapperBase(ABC):
     def _wrap_args(self, parsed_range, buffer):
         raise NotImplementedError('You must implement this method.')
 
+    @staticmethod
+    def _remove_range(parsed_range, buffer):
+        del buffer[parsed_range.start_row_index + 1:parsed_range.end_row_index + 1]
+
     def _get_offset(self, indent=None):
         return ' '*(self._indent if indent is None else indent)
 
