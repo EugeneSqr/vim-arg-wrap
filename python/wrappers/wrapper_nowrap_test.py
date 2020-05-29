@@ -72,8 +72,8 @@ def test_wrap_args_multiple_lines_below_first(arrange_vim_buffer, mock_parse_at_
         '    # comment line goes here',
         '    def func():',
         '        nowrap_method(no_wrap_a,',
-        '                          nowrap_b,',
-        '                          no_wrap_c)',
+        '                      nowrap_b,',
+        '                      no_wrap_c)',
         '# nowrap comment',
     ])
     mock_parse_at_cursor({

@@ -132,8 +132,62 @@ def test_parse_at_cursor_two_lines_cursor_positions(cursor_row, cursor_col):
         parse_at_cursor((cursor_row, cursor_col), buffer),
         [0, 1, 0, 'this_is_test_function(', ['a', 'b', 'c', 'd'], ') #test'])
 
-# TODO: add multiple lines tests (2 types with or without offset)
+@pytest.mark.parametrize(
+    ['offset', 'text_beginning'],
+    [('', ''), ('    ', 'test'), ('  ', '')])
+def test_parse_at_cursor_multiple_lines_inside_brackets_beginning(offset, text_beginning):
+    '''
+    GIVEN function invocation occupies multiple lines
+    AND beginning text is of varied length
+    AND offset is of varied length
+    AND cursor position is inside brackets
+    WHEN parsing the buffer range
+    THEN the data is extracted correctly
+    '''
+    buffer = [offset + text_beginning + '(a,',
+              '   b,',
+              '   c, ',
+              '   d)']
+    assert _properties_equal(
+        parse_at_cursor((2, 0), buffer),
+        [0, 3, len(offset), offset + text_beginning + '(', ['a', 'b', 'c', 'd'], ')'])
 
+@pytest.mark.parametrize('text_ending', ['', ' #test'])
+def test_parse_at_cursor_multiple_lines_inside_brackets_ending(text_ending):
+    '''
+    GIVEN function invocation occupies multiple lines
+    AND ending text is of varied length
+    AND cursor position is inside brackets
+    WHEN parsing the buffer range
+    THEN the data is extracted correctly
+    '''
+    buffer = ['this_is_test_function(',
+              '    a, ',
+              '    b, ',
+              '    c, d)' + text_ending]
+    assert _properties_equal(
+        parse_at_cursor((2, 0), buffer),
+        [0, 3, 0, 'this_is_test_function(', ['a', 'b', 'c', 'd'], ')' + text_ending])
+
+@pytest.mark.parametrize(
+    ['cursor_row', 'cursor_col'],
+    [(1, 0), (1, 21), (1, 23), (2, 0), (2, 2), (3, 1), (4, 3)])
+def test_parse_at_cursor_multiple_lines_cursor_positions(cursor_row, cursor_col):
+    '''
+    GIVEN function invocation occupies multiple lines
+    AND some text is present at the end
+    AND cursor position varies from top left to bottom right
+    WHEN parsing the buffer range
+    THEN the data is extracted correctly
+    AND result does not depend on cursor position
+    '''
+    buffer = ['this_is_test_function(a,',
+              'b, ',
+              ' c, ',
+              'd) #test']
+    assert _properties_equal(
+        parse_at_cursor((cursor_row, cursor_col), buffer),
+        [0, 3, 0, 'this_is_test_function(', ['a', 'b', 'c', 'd'], ') #test'])
 
 # # TODO: THE TESTS BELOW ARE TEMPORARY
 # def test_temp_last_bracket_index_1():
