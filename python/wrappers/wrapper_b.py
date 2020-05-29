@@ -10,7 +10,6 @@ class ArgWrapperB(ArgWrapperBase):
        c)
     '''
     def _wrap_args(self, parsed_range, buffer):
-        self._remove_range(parsed_range, buffer)
         buffer[parsed_range.start_row_index] = parsed_range.beginning
         range_offset = self._get_offset(parsed_range.start_row_indent)
         for arg_index, arg in enumerate(parsed_range.args):
