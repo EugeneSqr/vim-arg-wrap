@@ -1,6 +1,5 @@
 from .wrapper_base import ArgWrapperBase
 
-# TODO: add unit tests
 class ArgWrapperB(ArgWrapperBase):
     '''
     Applies wrap of type B:
