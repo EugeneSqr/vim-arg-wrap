@@ -1,21 +1,26 @@
 #pylint:disable=import-error
-from itertools import chain, repeat
 from vim import current, eval as vim_eval
 
 from wrappers import (
+    WrapperSequence,
     ArgWrapperA,
     ArgWrapperB,
     ArgWrapperNoWrap,
 )
 
-def _get_wrappers_iterator(indent):
-    return iter(chain.from_iterable(repeat([
-        ArgWrapperA(indent),
-        ArgWrapperB(indent),
-        ArgWrapperNoWrap(indent),
-    ])))
 
-_wrappers = _get_wrappers_iterator(int(vim_eval('&g:tabstop')))
+indent = int(vim_eval('&g:tabstop'))
+_wrappers = WrapperSequence([
+    ArgWrapperNoWrap(indent),
+    ArgWrapperA(indent),
+    ArgWrapperB(indent),
+])
 
 def wrap_args():
-    next(_wrappers).wrap_args(current.window.cursor, current.buffer)
+    _wrap_args(_wrappers.get_next_wrapper())
+
+def wrap_args_back():
+    _wrap_args(_wrappers.get_prev_wrapper())
+
+def _wrap_args(wrapper):
+    return wrapper.wrap_args(current.window.cursor, current.buffer)
