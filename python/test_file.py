@@ -5,5 +5,6 @@ def method_invocation(first, second, third):
     return result
 
 def some_other_func():
+    # comment
     some_result = method_invocation('first', 'second', 'third')
-# another comment
+    # another comment

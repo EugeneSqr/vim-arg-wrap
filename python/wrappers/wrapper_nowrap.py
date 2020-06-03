@@ -6,6 +6,6 @@ class ArgWrapperNoWrap(ArgWrapperBase):
     invoke_method(a, b, c)
     '''
     def _wrap_args(self, parsed_range, buffer):
-        buffer[parsed_range.start_row_index] = (parsed_range.beginning +
-                                                ', '.join(parsed_range.args) +
-                                                parsed_range.ending)
+        buffer.append(
+            parsed_range.beginning + ', '.join(parsed_range.args) + parsed_range.ending,
+            parsed_range.start_row_index)

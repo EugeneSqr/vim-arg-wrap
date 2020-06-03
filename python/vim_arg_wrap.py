@@ -5,6 +5,7 @@ from wrappers import (
     WrapperSequence,
     ArgWrapperA,
     ArgWrapperB,
+    ArgWrapperC,
     ArgWrapperNoWrap,
 )
 
@@ -14,6 +15,7 @@ _wrappers = WrapperSequence([
     ArgWrapperNoWrap(indent),
     ArgWrapperA(indent),
     ArgWrapperB(indent),
+    ArgWrapperC(None),
 ])
 
 def wrap_args():

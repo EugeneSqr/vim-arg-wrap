@@ -9,5 +9,5 @@ class ArgWrapperA(ArgWrapperBase):
     def _wrap_args(self, parsed_range, buffer):
         second_line = (self._get_offset(parsed_range.start_row_indent) + self._get_offset() +
                        ', '.join(parsed_range.args) + parsed_range.ending)
-        buffer[parsed_range.start_row_index] = parsed_range.beginning
+        buffer.append(parsed_range.beginning, parsed_range.start_row_index)
         buffer.append(second_line, parsed_range.start_row_index + 1)

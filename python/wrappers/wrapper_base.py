@@ -21,7 +21,7 @@ class ArgWrapperBase(ABC):
         return ' '*(self._indent if indent is None else indent)
 
 def _can_wrap(parsed_range):
-    return parsed_range is not None
+    return parsed_range is not None and parsed_range.args
 
 def _remove_range(parsed_range, buffer):
-    del buffer[parsed_range.start_row_index + 1:parsed_range.end_row_index + 1]
+    del buffer[parsed_range.start_row_index:parsed_range.end_row_index + 1]
