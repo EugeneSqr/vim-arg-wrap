@@ -1,6 +1,6 @@
 from . import wrapper_b
 
-def test_wrap_args_single_line(arrange_vim_buffer, mock_parse_at_cursor):
+def test_b_wrap_args_single_line(arrange_vim_buffer, mock_parse_at_cursor):
     buffer = arrange_vim_buffer([
         ' # b begin comment',
         '    def b_func():',
@@ -24,7 +24,7 @@ def test_wrap_args_single_line(arrange_vim_buffer, mock_parse_at_cursor):
         ' # b end comment',
     ]
 
-def test_wrap_args_two_lines(arrange_vim_buffer, mock_parse_at_cursor):
+def test_b_wrap_args_two_lines(arrange_vim_buffer, mock_parse_at_cursor):
     buffer = arrange_vim_buffer([
         ' # b begin comment',
         '    def b_func():',
@@ -49,7 +49,7 @@ def test_wrap_args_two_lines(arrange_vim_buffer, mock_parse_at_cursor):
         ' # b end comment',
     ]
 
-def test_wrap_args_multiple_lines(arrange_vim_buffer, mock_parse_at_cursor):
+def test_b_wrap_args_multiple_lines(arrange_vim_buffer, mock_parse_at_cursor):
     buffer = arrange_vim_buffer([
         ' # b begin comment',
         '    def b_func():',
@@ -76,7 +76,7 @@ def test_wrap_args_multiple_lines(arrange_vim_buffer, mock_parse_at_cursor):
         ' # b end comment',
     ]
 
-def test_wrap_args_multiple_lines_below_first(arrange_vim_buffer, mock_parse_at_cursor):
+def test_b_wrap_args_multiple_lines_below_first(arrange_vim_buffer, mock_parse_at_cursor):
     buffer = arrange_vim_buffer([
         ' # b begin comment',
         '    def b_func():',

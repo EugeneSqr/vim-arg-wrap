@@ -1,6 +1,6 @@
 from . import wrapper_c
 
-def test_wrap_args_single_line(arrange_vim_buffer, mock_parse_at_cursor):
+def test_c_wrap_args_single_line(arrange_vim_buffer, mock_parse_at_cursor):
     buffer = arrange_vim_buffer([
         ' # c begin comment',
         '   def c_func():',
@@ -15,15 +15,15 @@ def test_wrap_args_single_line(arrange_vim_buffer, mock_parse_at_cursor):
     })
     wrapper_c.ArgWrapperC(500).wrap_args((3, 1), buffer)
     assert buffer == [
-            ' # c begin comment',
-            '   def c_func():',
-            '         c_method(c_a,',
-            '                  c_b,',
-            '                  c_c)',
-            ' # c end comment',
+        ' # c begin comment',
+        '   def c_func():',
+        '         c_method(c_a,',
+        '                  c_b,',
+        '                  c_c)',
+        ' # c end comment',
     ]
 
-def test_wrap_args_two_lines(arrange_vim_buffer, mock_parse_at_cursor):
+def test_c_wrap_args_two_lines(arrange_vim_buffer, mock_parse_at_cursor):
     buffer = arrange_vim_buffer([
         ' # c begin comment',
         '    def c_func():',
@@ -47,7 +47,7 @@ def test_wrap_args_two_lines(arrange_vim_buffer, mock_parse_at_cursor):
         ' # c end comment',
     ]
 
-def test_wrap_args_multiple_lines(arrange_vim_buffer, mock_parse_at_cursor):
+def test_c_wrap_args_multiple_lines(arrange_vim_buffer, mock_parse_at_cursor):
     buffer = arrange_vim_buffer([
         ' # c begin comment',
         '    def c_func():',
@@ -73,7 +73,7 @@ def test_wrap_args_multiple_lines(arrange_vim_buffer, mock_parse_at_cursor):
         ' # c end comment',
     ]
 
-def test_wrap_args_multiple_lines_below_first(arrange_vim_buffer, mock_parse_at_cursor):
+def test_c_wrap_args_multiple_lines_below_first(arrange_vim_buffer, mock_parse_at_cursor):
     buffer = arrange_vim_buffer([
         ' # c begin comment',
         '    def c_func():',
