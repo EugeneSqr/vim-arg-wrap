@@ -1,3 +1,5 @@
+import pytest
+
 from . import wrapper_a
 
 def test_a_wrap_args_single_line(arrange_vim_buffer, mock_parse_at_cursor):
@@ -93,3 +95,37 @@ def test_a_wrap_args_multiple_lines_below_first(arrange_vim_buffer, mock_parse_a
         '            a_a, a_b, a_c)',
         ' # a end comment',
     ]
+
+def test_a_recognizes_a(mock_parse_at_cursor):
+    mock_parse_at_cursor({
+        'start_row_index': 2, 'end_row_index': 3, 'start_row_indent': 0,
+        'beginning': '        a_method(',
+        'args': ['a_a', 'a_b', 'a_c'],
+        'ending': ')',
+    })
+    assert wrapper_a.ArgWrapperA(4).recognized(None, None) is True
+
+def test_a_does_not_recognize_empty_range(mock_parse_at_cursor):
+    mock_parse_at_cursor(None)
+    assert wrapper_a.ArgWrapperA(4).recognized(None, None) is False
+
+def test_a_does_not_recognize_empty_args(mock_parse_at_cursor):
+    mock_parse_at_cursor({
+        'start_row_index': 2, 'end_row_index': 3, 'start_row_indent': 0,
+        'beginning': '        a_method(',
+        'args': [],
+        'ending': ')',
+    })
+    assert wrapper_a.ArgWrapperA(4).recognized(None, None) is False
+
+@pytest.mark.parametrize('a_row_index_diff', [0, 2, 3, 200])
+def test_a_does_not_recognize_other_ranges(mock_parse_at_cursor, a_row_index_diff):
+    start_row_index = 3
+    mock_parse_at_cursor({
+        'start_row_index': start_row_index, 'end_row_index': start_row_index + a_row_index_diff,
+        'start_row_indent': 0,
+        'beginning': '        a_method(',
+        'args': ['a_a', 'a_b', 'a_c'],
+        'ending': ')',
+    })
+    assert wrapper_a.ArgWrapperA(2).recognized(None, None) is False

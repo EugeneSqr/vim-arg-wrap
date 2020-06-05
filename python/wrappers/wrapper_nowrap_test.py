@@ -1,3 +1,5 @@
+import pytest
+
 from . import wrapper_nowrap
 
 def test_nowrap_wrap_args_single_line(arrange_vim_buffer, mock_parse_at_cursor):
@@ -89,3 +91,38 @@ def test_nowrap_wrap_args_multiple_lines_below_first(arrange_vim_buffer, mock_pa
         '        nowrap_method(nowrap_a, nowrap_b, nowrap_c)',
         ' # nowrap end comment',
     ]
+
+def test_nowrap_recognizes_nowrap(mock_parse_at_cursor):
+    mock_parse_at_cursor({
+        'start_row_index': 2, 'end_row_index': 2, 'start_row_indent': 8,
+        'beginning': '        nowrap_method(',
+        'args': ['nowrap_a', 'nowrap_b', 'nowrap_c'],
+        'ending': ')',
+    })
+    assert wrapper_nowrap.ArgWrapperNoWrap(4).recognized(None, None) is True
+
+def test_nowrap_does_not_recognize_empty_range(mock_parse_at_cursor):
+    mock_parse_at_cursor(None)
+    assert wrapper_nowrap.ArgWrapperNoWrap(4).recognized(None, None) is False
+
+def test_nowrap_does_not_recognize_empty_args(mock_parse_at_cursor):
+    mock_parse_at_cursor({
+        'start_row_index': 2, 'end_row_index': 2, 'start_row_indent': 8,
+        'beginning': '        nowrap_method(',
+        'args': [],
+        'ending': ')',
+    })
+    assert wrapper_nowrap.ArgWrapperNoWrap(4).recognized(None, None) is False
+
+@pytest.mark.parametrize('nowrap_row_index_diff', [1, 2, 3, 400])
+def test_nowrap_does_not_recognize_other_ranges(mock_parse_at_cursor, nowrap_row_index_diff):
+    start_row_index = 2
+    mock_parse_at_cursor({
+        'start_row_index': start_row_index,
+        'end_row_index': start_row_index + nowrap_row_index_diff,
+        'start_row_indent': 0,
+        'beginning': '        nowrap_method(',
+        'args': ['nowrap_a', 'nowrap_b', 'nowrap_c'],
+        'ending': ')',
+    })
+    assert wrapper_nowrap.ArgWrapperNoWrap(2).recognized(None, None) is False

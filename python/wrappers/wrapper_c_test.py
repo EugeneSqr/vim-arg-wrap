@@ -1,3 +1,5 @@
+import pytest
+
 from . import wrapper_c
 
 def test_c_wrap_args_single_line(arrange_vim_buffer, mock_parse_at_cursor):
@@ -97,3 +99,37 @@ def test_c_wrap_args_multiple_lines_below_first(arrange_vim_buffer, mock_parse_a
         '                 c_c)',
         ' # c end comment',
     ]
+
+def test_c_recognizes_c(mock_parse_at_cursor):
+    mock_parse_at_cursor({
+        'start_row_index': 2, 'end_row_index': 4, 'start_row_indent': 0,
+        'beginning': '        c_method(',
+        'args': ['c_a', 'c_b', 'c_c'],
+        'ending': ')',
+    })
+    assert wrapper_c.ArgWrapperC(4).recognized(None, None) is True
+
+def test_c_does_not_recognize_empty_range(mock_parse_at_cursor):
+    mock_parse_at_cursor(None)
+    assert wrapper_c.ArgWrapperC(4).recognized(None, None) is False
+
+def test_c_does_not_recognize_empty_args(mock_parse_at_cursor):
+    mock_parse_at_cursor({
+        'start_row_index': 2, 'end_row_index': 4, 'start_row_indent': 0,
+        'beginning': '        c_method(',
+        'args': [],
+        'ending': ')',
+    })
+    assert wrapper_c.ArgWrapperC(4).recognized(None, None) is False
+
+@pytest.mark.parametrize('c_row_index_diff', [0, 1, 3, 200])
+def test_c_does_not_recognize_other_ranges(mock_parse_at_cursor, c_row_index_diff):
+    start_row_index = 5
+    mock_parse_at_cursor({
+        'start_row_index': start_row_index, 'end_row_index': start_row_index + c_row_index_diff,
+        'start_row_indent': 0,
+        'beginning': '        c_method(',
+        'args': ['c_a', 'c_b', 'c_c'],
+        'ending': ')',
+    })
+    assert wrapper_c.ArgWrapperC(2).recognized(None, None) is False

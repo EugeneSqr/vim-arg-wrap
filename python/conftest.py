@@ -17,7 +17,9 @@ def fixture_arrange_vim_buffer():
 def fixture_mock_parse_at_cursor(monkeypatch):
     def _mock_parse_at_cursor(values):
         monkeypatch.setattr(
-            wrapper_base, 'parse_at_cursor', Mock(return_value=type('', (), values)))
+            wrapper_base,
+            'parse_at_cursor',
+            Mock(return_value=None if values is None else type('', (), values)))
     return _mock_parse_at_cursor
 
 class VimBuffer(list):
