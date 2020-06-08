@@ -19,10 +19,7 @@ _wrappers = WrapperSequence([
 ])
 
 def wrap_args():
-    _wrap_args(_wrappers.get_next_wrapper())
+    _wrappers.wrap_next(current.window.cursor, current.buffer)
 
 def wrap_args_back():
-    _wrap_args(_wrappers.get_prev_wrapper())
-
-def _wrap_args(wrapper):
-    return wrapper.wrap_args(current.window.cursor, current.buffer)
+    _wrappers.wrap_prev(current.window.cursor, current.buffer)

@@ -1,42 +1,97 @@
+from unittest.mock import Mock
+
 from . import wrapper_sequence
 
-def test_cycling_forward():
-    sequence = wrapper_sequence.WrapperSequence(['A', 'B', 'C'])
-    assert sequence.get_next_wrapper() == 'B'
-    assert sequence.get_next_wrapper() == 'C'
-    assert sequence.get_next_wrapper() == 'A'
-    assert sequence.get_next_wrapper() == 'B'
+def test_first_next_to_second():
+    wrapper_mocks = [
+        _create_wrapper(True),
+        _create_wrapper(False),
+        _create_wrapper(False),
+        _create_wrapper(False),
+    ]
+    sequence = wrapper_sequence.WrapperSequence(wrapper_mocks)
+    sequence.wrap_next('fake cursor', 'fake buffer')
+    wrapper_mocks[1].wrap_args.assert_called_once_with('fake cursor', 'fake buffer')
 
-def test_cycling_backward():
-    sequence = wrapper_sequence.WrapperSequence(['A', 'B', 'C'])
-    assert sequence.get_prev_wrapper() == 'C'
-    assert sequence.get_prev_wrapper() == 'B'
-    assert sequence.get_prev_wrapper() == 'A'
-    assert sequence.get_prev_wrapper() == 'C'
+def test_second_next_to_thrird():
+    wrapper_mocks = [
+        _create_wrapper(False),
+        _create_wrapper(True),
+        _create_wrapper(False),
+        _create_wrapper(False),
+    ]
+    sequence = wrapper_sequence.WrapperSequence(wrapper_mocks)
+    sequence.wrap_next('fake cursor', 'fake buffer')
+    wrapper_mocks[2].wrap_args.assert_called_once_with('fake cursor', 'fake buffer')
 
-def test_cycling_forward_single_wrapper():
-    sequence = wrapper_sequence.WrapperSequence(['A'])
-    assert sequence.get_next_wrapper() == 'A'
+def test_last_next_to_first():
+    wrapper_mocks = [
+        _create_wrapper(False),
+        _create_wrapper(False),
+        _create_wrapper(False),
+        _create_wrapper(True),
+    ]
+    sequence = wrapper_sequence.WrapperSequence(wrapper_mocks)
+    sequence.wrap_next('fake cursor', 'fake buffer')
+    wrapper_mocks[0].wrap_args.assert_called_once_with('fake cursor', 'fake buffer')
 
-def test_cycling_backward_single_wrapper():
-    sequence = wrapper_sequence.WrapperSequence(['A'])
-    assert sequence.get_prev_wrapper() == 'A'
+def test_last_back_to_last_but_one():
+    wrapper_mocks = [
+        _create_wrapper(False),
+        _create_wrapper(False),
+        _create_wrapper(False),
+        _create_wrapper(True),
+    ]
+    sequence = wrapper_sequence.WrapperSequence(wrapper_mocks)
+    sequence.wrap_prev('fake cursor', 'fake buffer')
+    wrapper_mocks[2].wrap_args.assert_called_once_with('fake cursor', 'fake buffer')
 
-def test_mixed_cycling():
-    sequence = wrapper_sequence.WrapperSequence(['A', 'B', 'C'])
-    assert sequence.get_next_wrapper() == 'B'
-    assert sequence.get_prev_wrapper() == 'A'
-    assert sequence.get_prev_wrapper() == 'C'
-    assert sequence.get_next_wrapper() == 'A'
+def test_first_back_to_last():
+    wrapper_mocks = [
+        _create_wrapper(True),
+        _create_wrapper(False),
+        _create_wrapper(False),
+        _create_wrapper(False),
+    ]
+    sequence = wrapper_sequence.WrapperSequence(wrapper_mocks)
+    sequence.wrap_prev('fake cursor', 'fake buffer')
+    wrapper_mocks[-1].wrap_args.assert_called_once_with('fake cursor', 'fake buffer')
 
-def test_large_number_forward():
-    sequence = wrapper_sequence.WrapperSequence(['A', 'B', 'C', 'D', 'E'])
-    for _ in range(1024):
-        wrapper = sequence.get_next_wrapper()
-    assert wrapper == 'E'
+def test_third_back_to_second():
+    wrapper_mocks = [
+        _create_wrapper(False),
+        _create_wrapper(False),
+        _create_wrapper(True),
+        _create_wrapper(False),
+    ]
+    sequence = wrapper_sequence.WrapperSequence(wrapper_mocks)
+    sequence.wrap_prev('fake cursor', 'fake buffer')
+    wrapper_mocks[1].wrap_args.assert_called_once_with('fake cursor', 'fake buffer')
 
-def test_large_nubmer_backward():
-    sequence = wrapper_sequence.WrapperSequence(['A', 'B', 'C', 'D', 'E', 'F'])
-    for _ in range(1024):
-        wrapper = sequence.get_prev_wrapper()
-    assert wrapper == 'C'
+def test_first_next_to_second_multiple_recognized():
+    wrapper_mocks = [
+        _create_wrapper(True),
+        _create_wrapper(True),
+        _create_wrapper(True),
+        _create_wrapper(True),
+    ]
+    sequence = wrapper_sequence.WrapperSequence(wrapper_mocks)
+    sequence.wrap_next('fake cursor', 'fake buffer')
+    wrapper_mocks[1].wrap_args.assert_called_once_with('fake cursor', 'fake buffer')
+
+def test_first_back_to_last_multiple_recognized():
+    wrapper_mocks = [
+        _create_wrapper(True),
+        _create_wrapper(True),
+        _create_wrapper(True),
+        _create_wrapper(True),
+    ]
+    sequence = wrapper_sequence.WrapperSequence(wrapper_mocks)
+    sequence.wrap_prev('fake cursor', 'fake buffer')
+    wrapper_mocks[-1].wrap_args.assert_called_once_with('fake cursor', 'fake buffer')
+
+def _create_wrapper(should_recognize):
+    return type('', (), {
+        'recognized': Mock(return_value=should_recognize),
+        'wrap_args': Mock(),
+    })
