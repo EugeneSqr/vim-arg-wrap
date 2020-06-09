@@ -1,24 +1,25 @@
+from args_parser import parse_args_line
+
 def parse_at_cursor(cursor, buffer):
-    arg_range = _get_arg_range(cursor, buffer)
-    if not arg_range:
+    args_range = _get_args_range(cursor, buffer)
+    if not args_range:
         return None
-    (start_row, start_col), (end_row, end_col) = arg_range
+    (start_row, start_col), (end_row, end_col) = args_range
     beginning = buffer[start_row][:start_col + 1]
     ending = buffer[end_row][end_col:]
     buffer_range_len = sum(len(buffer[index]) for index in range(start_row, end_row + 1))
-    arg_line_start = start_col + 1
-    arg_line_len = buffer_range_len - len(beginning) - len(ending)
-    arg_line = ''.join(buffer[start_row:end_row + 1])[arg_line_start:arg_line_start + arg_line_len]
+    args_start = start_col + 1
+    args_end = args_start + buffer_range_len - len(beginning) - len(ending)
     return type('', (), {
         'start_row_index': start_row,
         'end_row_index': end_row,
         'start_row_indent': _get_line_indent(buffer[start_row]),
         'beginning': beginning,
-        'args': _line_to_args(arg_line),
+        'args': parse_args_line(''.join(buffer[start_row:end_row + 1])[args_start:args_end]),
         'ending': ending,
     })
 
-def _get_arg_range(cursor, buffer):
+def _get_args_range(cursor, buffer):
     last_bracket_index = _get_last_closing_bracket_index(cursor, buffer)
     if not last_bracket_index:
         return None
@@ -81,6 +82,3 @@ def _get_line_indent(line):
             indent += 1
 
     return indent
-
-def _line_to_args(args):
-    return list(map(str.strip, args.split(',')))
