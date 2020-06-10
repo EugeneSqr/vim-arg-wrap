@@ -14,14 +14,14 @@ class ArgWrapperBase(ABC):
 
     def recognized(self, cursor, buffer):
         parsed_range = parse_at_cursor(cursor, buffer)
-        return _can_wrap(parsed_range) and self._recognized(parsed_range)
+        return _can_wrap(parsed_range) and self._recognized(parsed_range, buffer)
 
     @abstractmethod
     def _wrap_args(self, parsed_range, buffer):
         raise NotImplementedError('Provide implementation in a derived class')
 
     @abstractmethod
-    def _recognized(self, parsed_range):
+    def _recognized(self, parsed_range, buffer):
         raise NotImplementedError('Provide implementation in a derived class')
 
     def _get_offset(self, indent=None):

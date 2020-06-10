@@ -10,7 +10,7 @@ class ArgWrapperNoWrap(ArgWrapperBase):
             parsed_range.beginning + ', '.join(parsed_range.args) + parsed_range.ending,
             parsed_range.start_row_index)
 
-    def _recognized(self, parsed_range):
+    def _recognized(self, parsed_range, buffer):
         '''
         Determines if the provided range is wrapped with a nowrap wrapper
         '''

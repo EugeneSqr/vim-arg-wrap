@@ -19,7 +19,7 @@ class ArgWrapperC(ArgWrapperBase):
                 ',' if arg_index < len(parsed_range.args) - 1 else parsed_range.ending)
             buffer.append(arg_line, parsed_range.start_row_index + arg_index)
 
-    def _recognized(self, parsed_range):
+    def _recognized(self, parsed_range, buffer):
         '''
         Determines if the provided range is wrapped with a type C wrapper
         '''

@@ -98,12 +98,29 @@ def test_a_wrap_args_multiple_lines_below_first(arrange_vim_buffer, mock_parse_a
 
 def test_a_recognizes_a(mock_parse_at_cursor):
     mock_parse_at_cursor({
-        'start_row_index': 2, 'end_row_index': 3, 'start_row_indent': 0,
-        'beginning': '        a_method(',
+        'start_row_index': 0, 'end_row_index': 1, 'start_row_indent': 0,
+        'beginning': 'a_method(',
         'args': ['a_a', 'a_b', 'a_c'],
         'ending': ')',
     })
-    assert wrapper_a.ArgWrapperA(4).recognized(None, None) is True
+    buffer = [
+        'a_method(',
+        '    a_a, a_b, a_c)',
+    ]
+    assert wrapper_a.ArgWrapperA(4).recognized(None, buffer) is True
+
+def test_a_recognizes_a_with_first_row_ending(mock_parse_at_cursor):
+    mock_parse_at_cursor({
+        'start_row_index': 0, 'end_row_index': 1, 'start_row_indent': 0,
+        'beginning': 'a_method(',
+        'args': ['a_a', 'a_b', 'a_c'],
+        'ending': ')',
+    })
+    buffer = [
+        'a_method(# something other than a_a',
+        '    a_a, a_b, a_c)',
+    ]
+    assert wrapper_a.ArgWrapperA(4).recognized(None, buffer) is True
 
 def test_a_does_not_recognize_empty_range(mock_parse_at_cursor):
     mock_parse_at_cursor(None)
@@ -129,3 +146,16 @@ def test_a_does_not_recognize_other_ranges(mock_parse_at_cursor, a_row_index_dif
         'ending': ')',
     })
     assert wrapper_a.ArgWrapperA(2).recognized(None, None) is False
+
+def test_a_does_not_recognize_c_which_looks_similar(mock_parse_at_cursor):
+    mock_parse_at_cursor({
+        'start_row_index': 0, 'end_row_index': 1, 'start_row_indent': 0,
+        'beginning': 'a_method(',
+        'args': ['a_a', 'b_b'],
+        'ending': ')',
+    })
+    buffer = [
+        'a_method(a_a',
+        '         a_b)',
+    ]
+    assert wrapper_a.ArgWrapperA(9).recognized(None, buffer) is False
