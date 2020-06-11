@@ -24,8 +24,13 @@ def fixture_mock_parse_at_cursor(monkeypatch):
 
 class VimBuffer(list):
     """ Vim buffer replacement for testing """
-    def append(self, line, index=None):
+    def append(self, lines, index=None):
+        if not isinstance(lines, list):
+            lines = [lines]
+
         if not index:
-            super().append(line)
+            for line in lines:
+                super().append(line)
         else:
-            super().insert(index, line)
+            for i, line in enumerate(lines):
+                super().insert(index + i + 1, line)
