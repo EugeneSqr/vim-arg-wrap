@@ -6,20 +6,20 @@ def method_invocation(first, second, third):
 
 def some_other_func():
     # nowrap
-    nowrap = method_invocation('first', 'second', 'third')
+    nowrap = method_invocation(method(a, b, c), [a, b, c], {'a': a, 'b': b, 'c': [a, b, c]})
     # nowrap end
     # a
     a = method_invocation(
-        'first', 'second', 'third')
+        method(a, b, c), [a, b, c], {'a': a, 'b': b, 'c': [a, b, c]})
     # a end
     # b
-    a = method_invocation(
-        'first',
-        'second',
-        'third')
+    b = method_invocation(
+        method(a, b, c),
+        [a, b, c],
+        {'a': a, 'b': b, 'c': [a, b, c]})
     # b end
     # c
-    a = method_invocation('first',
-                          'second',
-                          'third')
+    c = method_invocation(method(a, b, c),
+                          [a, b, c],
+                          {'a': a, 'b': b, 'c': [a, b, c]})
     # c end
