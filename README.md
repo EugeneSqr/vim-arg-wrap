@@ -44,4 +44,4 @@ call vundle#end()
 ```
 then launch `vim` and run `:PluginInstall`
 ## Dependencies
-Python3
+Python 3.6
