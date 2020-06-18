@@ -30,8 +30,16 @@ The plugin exposes two commands to cycle through wrapping types:
 * `WrapArgs` to cycle forwards, i.e. `nowrap -> A -> B -> C -> nowrap`
 * `WrapArgsBack` to cycle backwards `nowrap -> C -> B -> A -> nowrap`
 
-With proper key bindings it becomes extremely easy to apply any type of wrapping. For example
+With proper key bindings it becomes extremely easy to apply any type of wrapping.
 ```viml
 nnoremap <leader>j :WrapArgs<cr>
 nnoremap <leader>j :WrapArgsBack<cr>
 ```
+## Installation
+Follow your vim package manager's instuctions for installing plugins from github. For [Vundle.vim](https://github.com/VundleVim/Vundle.vim) place these lines into your `vimrc`
+```viml
+call vundle#begin()
+Plugin 'eugenesqr/vim-arg-wrap'
+call vundle#end()
+```
+then launch `vim` and run `:PluginInstall`
