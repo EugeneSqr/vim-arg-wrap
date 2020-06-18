@@ -7,7 +7,7 @@ Suppose you have a function invocation with several arguments:
 ```javascript
 long_function_name(first_argument, second_argument, third_argument)
 ```
-The line happens to be too long and you want to break it into shorter lines. There are multiple common ways to do it:
+The line happens to be too long and you want to wrap it. The most common ways to do it:
 ```javascript
 long_function_name( // let it be type A wrapping
     first_argument, second_argument, third_argument)
