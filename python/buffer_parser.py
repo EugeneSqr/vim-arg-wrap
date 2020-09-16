@@ -41,7 +41,7 @@ def _get_last_closing_bracket_index(cursor, buffer):
             if last_bracket_col_index == len(line) - 1:
                 return current_row_index, last_bracket_col_index
             ending_col_index = _skip_spaces_after_last_closing_bracket(line, last_bracket_col_index)
-            if ending_col_index == len(line) or line[ending_col_index] != ',':
+            if _is_ending_commented_out(line, ending_col_index):
                 return current_row_index, last_bracket_col_index
     return None
 
@@ -50,6 +50,9 @@ def _skip_spaces_after_last_closing_bracket(line, index):
     while ending_index < len(line) and line[ending_index] == ' ':
         ending_index += 1
     return ending_index
+
+def _is_ending_commented_out(line, index):
+    return line[index] not in [',', '(', '[']
 
 def _get_first_opening_bracket_index(last_closing_bracket_index, buffer):
     if last_closing_bracket_index is None:
