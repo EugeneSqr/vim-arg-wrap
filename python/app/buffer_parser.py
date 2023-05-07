@@ -1,25 +1,44 @@
-from args_parser import parse_args_line
+from typing import TYPE_CHECKING, List, Optional, Tuple
+from dataclasses import dataclass, field
 
-def parse_at_cursor(cursor, buffer):
+from app.types import Cursor
+from .args_parser import parse_args_line
+
+if TYPE_CHECKING:
+    from vim import Buffer #pylint:disable=import-error
+
+@dataclass
+class ParsedRange:
+    # TODO: consider renaming to start_index
+    start_row_index: int = 0
+    # TODO: consider renaming to end_index
+    end_row_index: int = 0
+    start_row_indent: int = 0
+    beginning: str = ""
+    args: Tuple[str, ...] = ()
+    ending: str = ""
+
+def parse_at_cursor(cursor: Cursor, buffer: 'Buffer') -> ParsedRange:
     args_range = _get_args_range(cursor, buffer)
     if not args_range:
-        return None
+        return ParsedRange()
     (start_row, start_col), (end_row, end_col) = args_range
     beginning = buffer[start_row][:start_col + 1]
     ending = buffer[end_row][end_col:]
     buffer_range_len = sum(len(buffer[index]) for index in range(start_row, end_row + 1))
     args_start = start_col + 1
     args_end = args_start + buffer_range_len - len(beginning) - len(ending)
-    return type('', (), {
-        'start_row_index': start_row,
-        'end_row_index': end_row,
-        'start_row_indent': _get_line_indent(buffer[start_row]),
-        'beginning': beginning,
-        'args': parse_args_line(''.join(buffer[start_row:end_row + 1])[args_start:args_end]),
-        'ending': ending,
-    })
+    return ParsedRange(
+        start_row_index=start_row,
+        end_row_index=end_row,
+        start_row_indent=_get_line_indent(buffer[start_row]),
+        beginning=beginning,
+        args=parse_args_line(''.join(buffer[start_row:end_row + 1])[args_start:args_end]),
+        ending=ending)
 
-def _get_args_range(cursor, buffer):
+# TODO: consider removing Optional
+def _get_args_range(cursor: Cursor,
+                    buffer: 'Buffer') -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
     last_bracket_index = _get_last_closing_bracket_index(cursor, buffer)
     if not last_bracket_index:
         return None
@@ -28,11 +47,13 @@ def _get_args_range(cursor, buffer):
         return None
     return first_bracket_index, last_bracket_index
 
-def _cursor_to_index(cursor):
+# TODO: consider removing cols to avoid unnecessary Tuples down the road
+def _cursor_to_index(cursor: Cursor) -> Tuple[int, int]:
     row, col = cursor
     return row - 1, col
 
-def _get_last_closing_bracket_index(cursor, buffer):
+# TODO: consider removing Optional
+def _get_last_closing_bracket_index(cursor: Cursor, buffer: 'Buffer') -> Optional[Tuple[int, int]]:
     row_index, _ = _cursor_to_index(cursor)
     for current_row_index in range(row_index, len(buffer)):
         line = buffer[current_row_index]
@@ -45,16 +66,17 @@ def _get_last_closing_bracket_index(cursor, buffer):
                 return current_row_index, last_bracket_col_index
     return None
 
-def _skip_spaces_after_last_closing_bracket(line, index):
+def _skip_spaces_after_last_closing_bracket(line: str, index: int) -> int:
     ending_index = index + 1
     while ending_index < len(line) and line[ending_index] == ' ':
         ending_index += 1
     return ending_index
 
-def _is_ending_commented_out(line, index):
+def _is_ending_commented_out(line: str, index: int) -> bool:
     return line[index] not in [',', '(', '[']
 
-def _get_first_opening_bracket_index(last_closing_bracket_index, buffer):
+def _get_first_opening_bracket_index(last_closing_bracket_index: Optional[Tuple[int, int]],
+                                     buffer: 'Buffer') -> Optional[Tuple[int, int]]:
     if last_closing_bracket_index is None:
         return None
     row_index, col_index = last_closing_bracket_index
@@ -69,14 +91,14 @@ def _get_first_opening_bracket_index(last_closing_bracket_index, buffer):
                 return current_row_index, current_col_index
     return None
 
-def _update_bracket_balance(current_char, bracket_balance):
+def _update_bracket_balance(current_char: str, bracket_balance: int) -> int:
     if current_char == '(':
         bracket_balance -= 1
     elif current_char == ')':
         bracket_balance += 1
     return bracket_balance
 
-def _get_line_indent(line):
+def _get_line_indent(line: str) -> int:
     indent = 0
     if line:
         for char in line:

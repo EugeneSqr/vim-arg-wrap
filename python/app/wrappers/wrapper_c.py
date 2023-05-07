@@ -1,7 +1,13 @@
+from typing import TYPE_CHECKING
+
+from app.buffer_parser import ParsedRange
 from .wrapper_base import ArgWrapperBase
 
+if TYPE_CHECKING:
+    from vim import Buffer #pylint:disable=import-error
+
 class ArgWrapperC(ArgWrapperBase):
-    def _wrap_args(self, parsed_range, buffer):
+    def _wrap_args(self, parsed_range: ParsedRange, buffer: 'Buffer') -> None:
         '''
         Applies wrap of type C:
         method_invocation(a,
@@ -17,15 +23,15 @@ class ArgWrapperC(ArgWrapperBase):
                 ',' if arg_index < len(parsed_range.args) - 1 else parsed_range.ending)
             buffer[parsed_range.start_row_index + arg_index] = arg_line
 
-    def _recognized(self, parsed_range, buffer):
+    def _recognized(self, parsed_range: ParsedRange, buffer: 'Buffer') -> bool:
         '''
         Determines if the provided range is wrapped with a type C wrapper
         '''
         return (parsed_range.end_row_index - parsed_range.start_row_index ==
                 len(parsed_range.args) - 1)
 
-    def _lines_needed(self, args_count):
+    def _lines_needed(self, args_count: int) -> int:
         return 1 if args_count == 0 else args_count
 
-def _build_arg_line(arg, arg_offset, ending):
+def _build_arg_line(arg: str, arg_offset: str, ending: str) -> str:
     return arg_offset + arg + ending

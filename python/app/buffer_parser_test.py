@@ -3,16 +3,8 @@ from unittest.mock import Mock
 
 import pytest
 
-import buffer_parser
-
-_FIELD_NAMES = [
-    'start_row_index',
-    'end_row_index',
-    'start_row_indent',
-    'beginning',
-    'args',
-    'ending',
-]
+from . import buffer_parser
+from .buffer_parser import ParsedRange
 
 @pytest.fixture(name='arrange_parse_args_line')
 def fixture_arrange_parse_args_line(monkeypatch):
@@ -36,11 +28,11 @@ def test_parse_at_cursor_no_opening_bracket():
     THEN empty parsed range is returned
     '''
     buffer = ['test)']
-    assert buffer_parser.parse_at_cursor((1, 0), buffer) is None
+    _assert_empty(buffer_parser.parse_at_cursor((1, 0), buffer))
 
 def test_parse_at_cursor_no_closing_bracket():
     '''
-    GIVEN function invocation occupies single line
+    GIVEN function invocation occupies multiple lines
     AND closing bracket is absent
     WHEN parsing the buffer range
     THEN empty parsed range is returned
@@ -48,7 +40,7 @@ def test_parse_at_cursor_no_closing_bracket():
     buffer = ['test(',
               '     a, b,',
               '     c']
-    assert buffer_parser.parse_at_cursor((1, 0), buffer) is None
+    _assert_empty(buffer_parser.parse_at_cursor((1, 0), buffer))
 
 @pytest.mark.parametrize(
     ['offset', 'text_beginning'],
@@ -65,11 +57,11 @@ def test_parse_at_cursor_single_line_inside_brackets_beginning(offset,
     THEN the data is extracted correctly
     '''
     buffer = [offset + text_beginning + '(a, b, c, d)']
-    expected_args = ['a', 'b', 'c', 'd']
+    expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a, b, c, d', expected_args):
-        assert _properties_equal(
+        _assert_equal(
             buffer_parser.parse_at_cursor((1, len(offset) + len(text_beginning) + 1), buffer),
-            [0, 0, len(offset), offset + text_beginning + '(', expected_args, ')'])
+            ParsedRange(0, 0, len(offset), offset + text_beginning + '(', expected_args, ')'))
 
 @pytest.mark.parametrize('text_ending', ['', ' #test'])
 def test_parse_at_cursor_single_line_inside_brackets_ending(text_ending, arrange_parse_args_line):
@@ -81,11 +73,11 @@ def test_parse_at_cursor_single_line_inside_brackets_ending(text_ending, arrange
     THEN the data is extracted correctly
     '''
     buffer = ['this_is_test_function(a, b, c, d)' + text_ending]
-    expected_args = ['a', 'b', 'c', 'd']
+    expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a, b, c, d', expected_args):
-        assert _properties_equal(
+        _assert_equal(
             buffer_parser.parse_at_cursor((1, 23), buffer),
-            [0, 0, 0, 'this_is_test_function(', expected_args, ')' + text_ending])
+            ParsedRange(0, 0, 0, 'this_is_test_function(', expected_args, ')' + text_ending))
 
 @pytest.mark.parametrize('cursor_col', [0, 21, 23, 32, 36])
 def test_parse_at_cursor_single_line_cursor_positions(cursor_col, arrange_parse_args_line):
@@ -98,11 +90,11 @@ def test_parse_at_cursor_single_line_cursor_positions(cursor_col, arrange_parse_
     AND result does not depend on cursor position
     '''
     buffer = ['this_is_test_function(a, b, c, d) #test']
-    expected_args = ['a', 'b', 'c', 'd']
+    expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a, b, c, d', expected_args):
-        assert _properties_equal(
+        _assert_equal(
             buffer_parser.parse_at_cursor((1, cursor_col), buffer),
-            [0, 0, 0, 'this_is_test_function(', expected_args, ') #test'])
+            ParsedRange(0, 0, 0, 'this_is_test_function(', expected_args, ') #test'))
 
 @pytest.mark.parametrize(
     ['offset', 'text_beginning'],
@@ -120,11 +112,11 @@ def test_parse_at_cursor_two_lines_inside_brackets_beginning(offset,
     '''
     buffer = [offset + text_beginning + '(a, b,',
               '   c, d)']
-    expected_args = ['a', 'b', 'c', 'd']
+    expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a, b,   c, d', expected_args):
-        assert _properties_equal(
+        _assert_equal(
             buffer_parser.parse_at_cursor((2, 0), buffer),
-            [0, 1, len(offset), offset + text_beginning + '(', expected_args, ')'])
+            ParsedRange(0, 1, len(offset), offset + text_beginning + '(', expected_args, ')'))
 
 @pytest.mark.parametrize('text_ending', ['', ' #test'])
 def test_parse_at_cursor_two_lines_inside_brackets_ending(text_ending, arrange_parse_args_line):
@@ -137,11 +129,11 @@ def test_parse_at_cursor_two_lines_inside_brackets_ending(text_ending, arrange_p
     '''
     buffer = ['this_is_test_function(',
               '    a, b, c, d)' + text_ending]
-    expected_args = ['a', 'b', 'c', 'd']
+    expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('    a, b, c, d', expected_args):
-        assert _properties_equal(
+        _assert_equal(
             buffer_parser.parse_at_cursor((2, 0), buffer),
-            [0, 1, 0, 'this_is_test_function(', expected_args, ')' + text_ending])
+            ParsedRange(0, 1, 0, 'this_is_test_function(', expected_args, ')' + text_ending))
 
 @pytest.mark.parametrize(
     ['cursor_row', 'cursor_col'],
@@ -159,11 +151,11 @@ def test_parse_at_cursor_two_lines_cursor_positions(cursor_row,
     '''
     buffer = ['this_is_test_function(a, b, ',
               ' c, d) #test']
-    expected_args = ['a', 'b', 'c', 'd']
+    expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a, b,  c, d', expected_args):
-        assert _properties_equal(
+        _assert_equal(
             buffer_parser.parse_at_cursor((cursor_row, cursor_col), buffer),
-            [0, 1, 0, 'this_is_test_function(', expected_args, ') #test'])
+            ParsedRange(0, 1, 0, 'this_is_test_function(', expected_args, ') #test'))
 
 @pytest.mark.parametrize(
     ['offset', 'text_beginning'],
@@ -183,11 +175,11 @@ def test_parse_at_cursor_multiple_lines_inside_brackets_beginning(offset,
               '   b,',
               '   c, ',
               '   d)']
-    expected_args = ['a', 'b', 'c', 'd']
+    expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a,   b,   c,    d', expected_args):
-        assert _properties_equal(
+        _assert_equal(
             buffer_parser.parse_at_cursor((2, 0), buffer),
-            [0, 3, len(offset), offset + text_beginning + '(', expected_args, ')'])
+            ParsedRange(0, 3, len(offset), offset + text_beginning + '(', expected_args, ')'))
 
 @pytest.mark.parametrize('text_ending', ['', ' #test'])
 def test_parse_at_cursor_multiple_lines_inside_brackets_ending(text_ending,
@@ -203,11 +195,11 @@ def test_parse_at_cursor_multiple_lines_inside_brackets_ending(text_ending,
               '    a, ',
               '    b, ',
               '    c, d)' + text_ending]
-    expected_args = ['a', 'b', 'c', 'd']
+    expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('    a,     b,     c, d', expected_args):
-        assert _properties_equal(
+        _assert_equal(
             buffer_parser.parse_at_cursor((2, 0), buffer),
-            [0, 3, 0, 'this_is_test_function(', expected_args, ')' + text_ending])
+            ParsedRange(0, 3, 0, 'this_is_test_function(', expected_args, ')' + text_ending))
 
 @pytest.mark.parametrize(
     ['cursor_row', 'cursor_col'],
@@ -227,11 +219,11 @@ def test_parse_at_cursor_multiple_lines_cursor_positions(cursor_row,
               'b, ',
               ' c, ',
               'd) #test']
-    expected_args = ['a', 'b', 'c', 'd']
+    expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a,b,  c, d', expected_args):
-        assert _properties_equal(
+        _assert_equal(
             buffer_parser.parse_at_cursor((cursor_row, cursor_col), buffer),
-            [0, 3, 0, 'this_is_test_function(', expected_args, ') #test'])
+            ParsedRange(0, 3, 0, 'this_is_test_function(', expected_args, ') #test'))
 
 @pytest.mark.parametrize(
     ['cursor_row', 'cursor_col'],
@@ -248,12 +240,12 @@ def test_extra_brackets(cursor_row, cursor_col, arrange_parse_args_line):
     buffer = ['test((a) + (b), ',
               '    (b + c), d,',
               '    (f)) # comment']
-    expected_args = ['(a) + (b)', '(b + c)', 'd', '(f)']
+    expected_args = ('(a) + (b)', '(b + c)', 'd', '(f)')
     with arrange_parse_args_line(
             '(a) + (b),     (b + c), d,    (f)', expected_args):
-        assert _properties_equal(
+        _assert_equal(
             buffer_parser.parse_at_cursor((cursor_row, cursor_col), buffer),
-            [0, 2, 0, 'test(', expected_args, ') # comment'])
+            ParsedRange(0, 2, 0, 'test(', expected_args, ') # comment'))
 
 @pytest.mark.parametrize(
     ['cursor_row', 'cursor_col'],
@@ -275,11 +267,14 @@ def test_nested_invocations_with_square_brackets(cursor_row, cursor_col, arrange
         '    n_2(n_3(b))[0],',
         '    n_4(c))'
     ]
-    expected_args = ['n_1(a)(a1)', 'n_2(n_3(b))[0]', 'n_4(c)']
+    expected_args = ('n_1(a)(a1)', 'n_2(n_3(b))[0]', 'n_4(c)')
     with arrange_parse_args_line('    n_1(a)(a1),    n_2(n_3(b))[0],    n_4(c)', expected_args):
-        assert _properties_equal(
+        _assert_equal(
             buffer_parser.parse_at_cursor((cursor_row, cursor_col), buffer),
-            [0, 3, 0, 'test(', expected_args, ')'])
+            ParsedRange(0, 3, 0, 'test(', expected_args, ')'))
 
-def _properties_equal(actual, expected):
-    return all(actual.__dict__[_FIELD_NAMES[i]] == expected[i] for i in range(len(_FIELD_NAMES)))
+def _assert_equal(actual: ParsedRange, expected: ParsedRange) -> None:
+    assert actual == expected
+
+def _assert_empty(actual: ParsedRange) -> None:
+    assert actual.args == ()

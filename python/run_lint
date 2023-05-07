@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -e
+
+typing=false
+for i in "$@"; do
+    case $i in
+        --typing)
+        typing=true
+        shift
+        ;;
+    esac
+done
+
+. env/bin/activate
+if [ "$typing" = true ]; then
+    mypy --install-types --non-interactive --strict -p app 2>&1
+fi
+find ./app -not \( -path "*env/*" -prune \) -type f -name '*.py' | xargs pylint

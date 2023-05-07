@@ -1,7 +1,13 @@
+from typing import TYPE_CHECKING
+
+from app.buffer_parser import ParsedRange
 from .wrapper_base import ArgWrapperBase
 
+if TYPE_CHECKING:
+    from vim import Buffer #pylint:disable=import-error
+
 class ArgWrapperA(ArgWrapperBase):
-    def _wrap_args(self, parsed_range, buffer):
+    def _wrap_args(self, parsed_range: ParsedRange, buffer: 'Buffer') -> None:
         '''
         Applies wrap of type A:
         method_invocation(
@@ -12,17 +18,17 @@ class ArgWrapperA(ArgWrapperBase):
         buffer[parsed_range.start_row_index] = parsed_range.beginning
         buffer[parsed_range.start_row_index + 1] = second_line
 
-    def _recognized(self, parsed_range, buffer):
+    def _recognized(self, parsed_range: ParsedRange, buffer: 'Buffer') -> bool:
         '''
         Determines if the provided range is wrapped with a type A wrapper
         '''
         wraps_count = parsed_range.end_row_index - parsed_range.start_row_index
         return wraps_count == 1 and not _has_first_argument_in_start_row(parsed_range, buffer)
 
-    def _lines_needed(self, args_count):
+    def _lines_needed(self, args_count: int) -> int:
         return 1 if args_count == 0 else 2
 
-def _has_first_argument_in_start_row(parsed_range, buffer):
+def _has_first_argument_in_start_row(parsed_range: ParsedRange, buffer: 'Buffer') -> bool:
     if not parsed_range.args:
         return False
 

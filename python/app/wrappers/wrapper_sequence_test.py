@@ -1,8 +1,8 @@
 from unittest.mock import Mock
 
-from . import wrapper_sequence
+from app.wrappers import wrapper_sequence
 
-def test_first_next_to_second():
+def test_first_next_to_second() -> None:
     wrapper_mocks = [
         _create_wrapper(True),
         _create_wrapper(False),
@@ -13,7 +13,7 @@ def test_first_next_to_second():
     sequence.wrap_next('fake cursor', 'fake buffer')
     wrapper_mocks[1].wrap_args.assert_called_once_with('fake cursor', 'fake buffer')
 
-def test_second_next_to_thrird():
+def test_second_next_to_thrird() -> None:
     wrapper_mocks = [
         _create_wrapper(False),
         _create_wrapper(True),
@@ -24,7 +24,7 @@ def test_second_next_to_thrird():
     sequence.wrap_next('fake cursor', 'fake buffer')
     wrapper_mocks[2].wrap_args.assert_called_once_with('fake cursor', 'fake buffer')
 
-def test_last_next_to_first():
+def test_last_next_to_first() -> None:
     wrapper_mocks = [
         _create_wrapper(False),
         _create_wrapper(False),
@@ -35,7 +35,7 @@ def test_last_next_to_first():
     sequence.wrap_next('fake cursor', 'fake buffer')
     wrapper_mocks[0].wrap_args.assert_called_once_with('fake cursor', 'fake buffer')
 
-def test_last_back_to_last_but_one():
+def test_last_back_to_last_but_one() -> None:
     wrapper_mocks = [
         _create_wrapper(False),
         _create_wrapper(False),
@@ -46,7 +46,7 @@ def test_last_back_to_last_but_one():
     sequence.wrap_prev('fake cursor', 'fake buffer')
     wrapper_mocks[2].wrap_args.assert_called_once_with('fake cursor', 'fake buffer')
 
-def test_first_back_to_last():
+def test_first_back_to_last() -> None:
     wrapper_mocks = [
         _create_wrapper(True),
         _create_wrapper(False),
@@ -57,7 +57,7 @@ def test_first_back_to_last():
     sequence.wrap_prev('fake cursor', 'fake buffer')
     wrapper_mocks[-1].wrap_args.assert_called_once_with('fake cursor', 'fake buffer')
 
-def test_third_back_to_second():
+def test_third_back_to_second() -> None:
     wrapper_mocks = [
         _create_wrapper(False),
         _create_wrapper(False),
@@ -68,7 +68,7 @@ def test_third_back_to_second():
     sequence.wrap_prev('fake cursor', 'fake buffer')
     wrapper_mocks[1].wrap_args.assert_called_once_with('fake cursor', 'fake buffer')
 
-def test_first_next_to_second_multiple_recognized():
+def test_first_next_to_second_multiple_recognized() -> None:
     wrapper_mocks = [
         _create_wrapper(True),
         _create_wrapper(True),
@@ -79,7 +79,7 @@ def test_first_next_to_second_multiple_recognized():
     sequence.wrap_next('fake cursor', 'fake buffer')
     wrapper_mocks[1].wrap_args.assert_called_once_with('fake cursor', 'fake buffer')
 
-def test_first_back_to_last_multiple_recognized():
+def test_first_back_to_last_multiple_recognized() -> None:
     wrapper_mocks = [
         _create_wrapper(True),
         _create_wrapper(True),

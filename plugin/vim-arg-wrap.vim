@@ -13,7 +13,7 @@ import vim
 plugin_root_dir = vim.eval('s:plugin_root_dir')
 python_root_dir = normpath(join(plugin_root_dir, '..', 'python'))
 sys.path.insert(0, python_root_dir)
-from vim_arg_wrap import wrap_args, wrap_args_back
+from app.vim_arg_wrap import wrap_args, wrap_args_back
 EOF
 function! WrapArgs()
     python3 wrap_args()

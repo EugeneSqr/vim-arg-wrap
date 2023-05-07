@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from wrappers import wrapper_base
+from app.wrappers import wrapper_base
 
 @pytest.fixture(name='arrange_vim_buffer')
 def fixture_arrange_vim_buffer():
@@ -15,11 +15,8 @@ def fixture_arrange_vim_buffer():
 
 @pytest.fixture(name='mock_parse_at_cursor')
 def fixture_mock_parse_at_cursor(monkeypatch):
-    def _mock_parse_at_cursor(values):
-        monkeypatch.setattr(
-            wrapper_base,
-            'parse_at_cursor',
-            Mock(return_value=None if values is None else type('', (), values)))
+    def _mock_parse_at_cursor(expected):
+        monkeypatch.setattr(wrapper_base, 'parse_at_cursor', Mock(return_value=expected))
     return _mock_parse_at_cursor
 
 class VimBuffer(list):
