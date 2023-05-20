@@ -15,14 +15,14 @@ class ArgWrapperA(ArgWrapperBase):
         '''
         second_line = (self._get_offset(signature.start_row_indent) + self._get_offset() +
                        ', '.join(signature.args) + signature.ending)
-        buffer[signature.start_row_index] = signature.beginning
-        buffer[signature.start_row_index + 1] = second_line
+        buffer[signature.rows.start] = signature.beginning
+        buffer[signature.rows.start + 1] = second_line
 
     def _recognized(self, signature: Signature, buffer: 'Buffer') -> bool:
         '''
         Determines if the provided range is wrapped with a type A wrapper
         '''
-        wraps_count = signature.end_row_index - signature.start_row_index
+        wraps_count = signature.rows.end - signature.rows.start
         return wraps_count == 1 and not _has_first_argument_in_start_row(signature, buffer)
 
     def _lines_needed(self, args_count: int) -> int:
@@ -32,7 +32,7 @@ def _has_first_argument_in_start_row(signature: Signature, buffer: 'Buffer') -> 
     if not signature.args:
         return False
 
-    start_row = buffer[signature.start_row_index]
+    start_row = buffer[signature.rows.start]
     if len(start_row) < len(signature.beginning) + len(signature.args[0]):
         return False
 

@@ -15,20 +15,20 @@ class ArgWrapperB(ArgWrapperBase):
            b,
            c)
         '''
-        buffer[signature.start_row_index] = signature.beginning
+        buffer[signature.rows.start] = signature.beginning
         range_offset = self._get_offset() + self._get_offset(signature.start_row_indent)
         for arg_index, arg in enumerate(signature.args):
             arg_line = _build_arg_line(
                 arg,
                 range_offset,
                 ',' if arg_index < len(signature.args) - 1 else signature.ending)
-            buffer[signature.start_row_index + arg_index + 1] = arg_line
+            buffer[signature.rows.start + arg_index + 1] = arg_line
 
     def _recognized(self, signature: Signature, buffer: 'Buffer') -> bool:
         '''
         Determines if the provided range is wrapped with a type B wrapper
         '''
-        return signature.end_row_index - signature.start_row_index == len(signature.args)
+        return signature.rows.end - signature.rows.start == len(signature.args)
 
     def _lines_needed(self, args_count: int) -> int:
         return args_count + 1

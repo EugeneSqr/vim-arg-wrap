@@ -12,7 +12,7 @@ class ArgWrapperNoWrap(ArgWrapperBase):
         Converts block of text to its nowrapped form:
         invoke_method(a, b, c)
         '''
-        buffer[signature.start_row_index] = (
+        buffer[signature.rows.start] = (
             signature.beginning + ', '.join(signature.args) + signature.ending
         )
 
@@ -20,7 +20,7 @@ class ArgWrapperNoWrap(ArgWrapperBase):
         '''
         Determines if the provided range is wrapped with a nowrap wrapper
         '''
-        return signature.end_row_index - signature.start_row_index == 0
+        return signature.rows.end - signature.rows.start == 0
 
     def _lines_needed(self, args_count: int) -> int:
         return 1

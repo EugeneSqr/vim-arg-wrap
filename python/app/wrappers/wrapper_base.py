@@ -38,18 +38,18 @@ class ArgWrapperBase(ABC):
         return ' '*(self._indent if indent is None else indent)
 
     def _allocate_lines(self, signature: Signature, buffer: 'Buffer') -> None:
-        lines_occupied = signature.end_row_index - signature.start_row_index + 1
+        lines_occupied = signature.rows.end - signature.rows.start + 1
         lines_needed = self._lines_needed(len(signature.args))
         if lines_needed >= lines_occupied:
-            buffer.append(['']*(lines_needed - lines_occupied), signature.start_row_index)
+            buffer.append(['']*(lines_needed - lines_occupied), signature.rows.start)
         else:
             del buffer[
-                signature.start_row_index:
-                signature.start_row_index + lines_occupied - lines_needed
+                signature.rows.start:
+                signature.rows.start + lines_occupied - lines_needed
             ]
 
 def _can_wrap(signature: Signature) -> bool:
     return len(signature.args) > 0
 
 def _remove_range(signature: Signature, buffer: 'Buffer') -> None:
-    del buffer[signature.start_row_index:signature.end_row_index + 1]
+    del buffer[signature.rows.start:signature.rows.end + 1]

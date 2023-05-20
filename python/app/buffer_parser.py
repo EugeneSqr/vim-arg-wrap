@@ -8,11 +8,14 @@ if TYPE_CHECKING:
     from vim import Buffer #pylint:disable=import-error
 
 @dataclass
+class RowsRange:
+    start: int = 0
+    end: int = 0
+
+@dataclass
 class Signature:
-    # TODO: consider renaming to start_index
-    start_row_index: int = 0
-    # TODO: consider renaming to end_index
-    end_row_index: int = 0
+    rows: RowsRange = RowsRange()
+    # TODO: consider moving start_rows_index to RowsRange signature.rows.start_indent
     start_row_indent: int = 0
     beginning: str = ""
     args: Tuple[str, ...] = ()
@@ -29,8 +32,7 @@ def signature_at_cursor(cursor: Cursor, buffer: 'Buffer') -> Signature:
     args_start = start_col + 1
     args_end = args_start + buffer_range_len - len(beginning) - len(ending)
     return Signature(
-        start_row_index=start_row,
-        end_row_index=end_row,
+        rows=RowsRange(start_row, end_row),
         start_row_indent=_get_line_indent(buffer[start_row]),
         beginning=beginning,
         args=parse_args_line(''.join(buffer[start_row:end_row + 1])[args_start:args_end]),
