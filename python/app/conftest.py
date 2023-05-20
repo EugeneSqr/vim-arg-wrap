@@ -13,11 +13,11 @@ def fixture_arrange_vim_buffer():
         return vim_buffer
     return _arrange_vim_buffer
 
-@pytest.fixture(name='mock_parse_at_cursor')
-def fixture_mock_parse_at_cursor(monkeypatch):
-    def _mock_parse_at_cursor(expected):
-        monkeypatch.setattr(wrapper_base, 'parse_at_cursor', Mock(return_value=expected))
-    return _mock_parse_at_cursor
+@pytest.fixture(name='mock_signature_at_cursor')
+def fixture_mock_signature_at_cursor(monkeypatch):
+    def _mock_signature_at_cursor(expected):
+        monkeypatch.setattr(wrapper_base, 'signature_at_cursor', Mock(return_value=expected))
+    return _mock_signature_at_cursor
 
 class VimBuffer(list):
     """ Vim buffer replacement for testing """

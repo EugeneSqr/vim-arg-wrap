@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Optional
 from abc import ABC, abstractmethod
 
-from app.buffer_parser import parse_at_cursor, ParsedRange
+from app.buffer_parser import signature_at_cursor, Signature
 from app.types import Cursor
 
 if TYPE_CHECKING:
@@ -12,21 +12,21 @@ class ArgWrapperBase(ABC):
         self._indent = indent
 
     def wrap_args(self, cursor: Cursor, buffer: 'Buffer') -> None:
-        parsed_range = parse_at_cursor(cursor, buffer)
-        if _can_wrap(parsed_range):
-            self._allocate_lines(parsed_range, buffer)
-            self._wrap_args(parsed_range, buffer)
+        signature = signature_at_cursor(cursor, buffer)
+        if _can_wrap(signature):
+            self._allocate_lines(signature, buffer)
+            self._wrap_args(signature, buffer)
 
     def recognized(self, cursor: Cursor, buffer: 'Buffer') -> bool:
-        parsed_range = parse_at_cursor(cursor, buffer)
-        return _can_wrap(parsed_range) and self._recognized(parsed_range, buffer)
+        signature = signature_at_cursor(cursor, buffer)
+        return _can_wrap(signature) and self._recognized(signature, buffer)
 
     @abstractmethod
-    def _wrap_args(self, parsed_range: ParsedRange, buffer: 'Buffer') -> None:
+    def _wrap_args(self, signature: Signature, buffer: 'Buffer') -> None:
         pass
 
     @abstractmethod
-    def _recognized(self, parsed_range: ParsedRange, buffer: 'Buffer') -> bool:
+    def _recognized(self, signature: Signature, buffer: 'Buffer') -> bool:
         pass
 
     @abstractmethod
@@ -37,19 +37,19 @@ class ArgWrapperBase(ABC):
     def _get_offset(self, indent: Optional[int] = None) -> str:
         return ' '*(self._indent if indent is None else indent)
 
-    def _allocate_lines(self, parsed_range: ParsedRange, buffer: 'Buffer') -> None:
-        lines_occupied = parsed_range.end_row_index - parsed_range.start_row_index + 1
-        lines_needed = self._lines_needed(len(parsed_range.args))
+    def _allocate_lines(self, signature: Signature, buffer: 'Buffer') -> None:
+        lines_occupied = signature.end_row_index - signature.start_row_index + 1
+        lines_needed = self._lines_needed(len(signature.args))
         if lines_needed >= lines_occupied:
-            buffer.append(['']*(lines_needed - lines_occupied), parsed_range.start_row_index)
+            buffer.append(['']*(lines_needed - lines_occupied), signature.start_row_index)
         else:
             del buffer[
-                parsed_range.start_row_index:
-                parsed_range.start_row_index + lines_occupied - lines_needed
+                signature.start_row_index:
+                signature.start_row_index + lines_occupied - lines_needed
             ]
 
-def _can_wrap(parsed_range: ParsedRange) -> bool:
-    return len(parsed_range.args) > 0
+def _can_wrap(signature: Signature) -> bool:
+    return len(signature.args) > 0
 
-def _remove_range(parsed_range: ParsedRange, buffer: 'Buffer') -> None:
-    del buffer[parsed_range.start_row_index:parsed_range.end_row_index + 1]
+def _remove_range(signature: Signature, buffer: 'Buffer') -> None:
+    del buffer[signature.start_row_index:signature.end_row_index + 1]

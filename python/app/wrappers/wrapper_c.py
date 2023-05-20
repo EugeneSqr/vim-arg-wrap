@@ -1,34 +1,34 @@
 from typing import TYPE_CHECKING
 
-from app.buffer_parser import ParsedRange
+from app.buffer_parser import Signature
 from .wrapper_base import ArgWrapperBase
 
 if TYPE_CHECKING:
     from vim import Buffer #pylint:disable=import-error
 
 class ArgWrapperC(ArgWrapperBase):
-    def _wrap_args(self, parsed_range: ParsedRange, buffer: 'Buffer') -> None:
+    def _wrap_args(self, signature: Signature, buffer: 'Buffer') -> None:
         '''
         Applies wrap of type C:
         method_invocation(a,
                           b,
                           c)
         '''
-        buffer[parsed_range.start_row_index] = parsed_range.beginning + parsed_range.args[0] + ','
-        arg_offset = self._get_offset(len(parsed_range.beginning))
-        for arg_index in range(1, len(parsed_range.args)):
+        buffer[signature.start_row_index] = signature.beginning + signature.args[0] + ','
+        arg_offset = self._get_offset(len(signature.beginning))
+        for arg_index in range(1, len(signature.args)):
             arg_line = _build_arg_line(
-                parsed_range.args[arg_index],
+                signature.args[arg_index],
                 arg_offset,
-                ',' if arg_index < len(parsed_range.args) - 1 else parsed_range.ending)
-            buffer[parsed_range.start_row_index + arg_index] = arg_line
+                ',' if arg_index < len(signature.args) - 1 else signature.ending)
+            buffer[signature.start_row_index + arg_index] = arg_line
 
-    def _recognized(self, parsed_range: ParsedRange, buffer: 'Buffer') -> bool:
+    def _recognized(self, signature: Signature, buffer: 'Buffer') -> bool:
         '''
         Determines if the provided range is wrapped with a type C wrapper
         '''
-        return (parsed_range.end_row_index - parsed_range.start_row_index ==
-                len(parsed_range.args) - 1)
+        return (signature.end_row_index - signature.start_row_index ==
+                len(signature.args) - 1)
 
     def _lines_needed(self, args_count: int) -> int:
         return 1 if args_count == 0 else args_count

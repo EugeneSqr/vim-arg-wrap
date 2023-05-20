@@ -1,5 +1,5 @@
-from typing import TYPE_CHECKING, List, Optional, Tuple
-from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, Optional, Tuple
+from dataclasses import dataclass
 
 from app.types import Cursor
 from .args_parser import parse_args_line
@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from vim import Buffer #pylint:disable=import-error
 
 @dataclass
-class ParsedRange:
+class Signature:
     # TODO: consider renaming to start_index
     start_row_index: int = 0
     # TODO: consider renaming to end_index
@@ -18,17 +18,17 @@ class ParsedRange:
     args: Tuple[str, ...] = ()
     ending: str = ""
 
-def parse_at_cursor(cursor: Cursor, buffer: 'Buffer') -> ParsedRange:
+def signature_at_cursor(cursor: Cursor, buffer: 'Buffer') -> Signature:
     args_range = _get_args_range(cursor, buffer)
     if not args_range:
-        return ParsedRange()
+        return Signature()
     (start_row, start_col), (end_row, end_col) = args_range
     beginning = buffer[start_row][:start_col + 1]
     ending = buffer[end_row][end_col:]
     buffer_range_len = sum(len(buffer[index]) for index in range(start_row, end_row + 1))
     args_start = start_col + 1
     args_end = args_start + buffer_range_len - len(beginning) - len(ending)
-    return ParsedRange(
+    return Signature(
         start_row_index=start_row,
         end_row_index=end_row,
         start_row_indent=_get_line_indent(buffer[start_row]),

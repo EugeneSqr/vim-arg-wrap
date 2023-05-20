@@ -1,13 +1,13 @@
 from typing import TYPE_CHECKING
 
-from app.buffer_parser import ParsedRange
+from app.buffer_parser import Signature
 from .wrapper_base import ArgWrapperBase
 
 if TYPE_CHECKING:
     from vim import Buffer #pylint:disable=import-error
 
 class ArgWrapperD(ArgWrapperBase):
-    def _wrap_args(self, parsed_range: ParsedRange, buffer: 'Buffer') -> None:
+    def _wrap_args(self, signature: Signature, buffer: 'Buffer') -> None:
         '''
         Applies wrap of type D:
         invoke_method(
@@ -18,7 +18,7 @@ class ArgWrapperD(ArgWrapperBase):
         '''
         raise NotImplementedError()
 
-    def _recognized(self, parsed_range: ParsedRange, buffer: 'Buffer') -> bool:
+    def _recognized(self, signature: Signature, buffer: 'Buffer') -> bool:
         '''
         Determines if the provided range is wrapped with a D wrapper
         '''

@@ -1,13 +1,13 @@
 from typing import TYPE_CHECKING
 
-from app.buffer_parser import ParsedRange
+from app.buffer_parser import Signature
 from .wrapper_base import ArgWrapperBase
 
 if TYPE_CHECKING:
     from vim import Buffer #pylint:disable=import-error
 
 class ArgWrapperB(ArgWrapperBase):
-    def _wrap_args(self, parsed_range: ParsedRange, buffer: 'Buffer') -> None:
+    def _wrap_args(self, signature: Signature, buffer: 'Buffer') -> None:
         '''
         Applies wrap of type B:
         method_invocation(
@@ -15,20 +15,20 @@ class ArgWrapperB(ArgWrapperBase):
            b,
            c)
         '''
-        buffer[parsed_range.start_row_index] = parsed_range.beginning
-        range_offset = self._get_offset() + self._get_offset(parsed_range.start_row_indent)
-        for arg_index, arg in enumerate(parsed_range.args):
+        buffer[signature.start_row_index] = signature.beginning
+        range_offset = self._get_offset() + self._get_offset(signature.start_row_indent)
+        for arg_index, arg in enumerate(signature.args):
             arg_line = _build_arg_line(
                 arg,
                 range_offset,
-                ',' if arg_index < len(parsed_range.args) - 1 else parsed_range.ending)
-            buffer[parsed_range.start_row_index + arg_index + 1] = arg_line
+                ',' if arg_index < len(signature.args) - 1 else signature.ending)
+            buffer[signature.start_row_index + arg_index + 1] = arg_line
 
-    def _recognized(self, parsed_range: ParsedRange, buffer: 'Buffer') -> bool:
+    def _recognized(self, signature: Signature, buffer: 'Buffer') -> bool:
         '''
         Determines if the provided range is wrapped with a type B wrapper
         '''
-        return parsed_range.end_row_index - parsed_range.start_row_index == len(parsed_range.args)
+        return signature.end_row_index - signature.start_row_index == len(signature.args)
 
     def _lines_needed(self, args_count: int) -> int:
         return args_count + 1

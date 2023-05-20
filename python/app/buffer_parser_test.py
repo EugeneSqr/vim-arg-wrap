@@ -4,7 +4,7 @@ from unittest.mock import Mock
 import pytest
 
 from . import buffer_parser
-from .buffer_parser import ParsedRange
+from .buffer_parser import Signature
 
 @pytest.fixture(name='arrange_parse_args_line')
 def fixture_arrange_parse_args_line(monkeypatch):
@@ -20,34 +20,34 @@ def fixture_arrange_parse_args_line(monkeypatch):
 
     return create_mock
 
-def test_parse_at_cursor_no_opening_bracket():
+def test_signature_at_cursor_no_opening_bracket():
     '''
     GIVEN function invocation occupies single line
     AND opening bracket is absent
     WHEN parsing the buffer range
-    THEN empty parsed range is returned
+    THEN empty signature is returned
     '''
     buffer = ['test)']
-    _assert_empty(buffer_parser.parse_at_cursor((1, 0), buffer))
+    _assert_empty(buffer_parser.signature_at_cursor((1, 0), buffer))
 
-def test_parse_at_cursor_no_closing_bracket():
+def test_signature_at_cursor_no_closing_bracket():
     '''
     GIVEN function invocation occupies multiple lines
     AND closing bracket is absent
     WHEN parsing the buffer range
-    THEN empty parsed range is returned
+    THEN empty signature is returned
     '''
     buffer = ['test(',
               '     a, b,',
               '     c']
-    _assert_empty(buffer_parser.parse_at_cursor((1, 0), buffer))
+    _assert_empty(buffer_parser.signature_at_cursor((1, 0), buffer))
 
 @pytest.mark.parametrize(
     ['offset', 'text_beginning'],
     [('', ''), ('    ', 'test'), ('  ', '')])
-def test_parse_at_cursor_single_line_inside_brackets_beginning(offset,
-                                                               text_beginning,
-                                                               arrange_parse_args_line):
+def test_signature_at_cursor_single_line_inside_brackets_beginning(offset,
+                                                                   text_beginning,
+                                                                   arrange_parse_args_line):
     '''
     GIVEN function invocation occupies single line
     AND beginning text is of varied length
@@ -60,11 +60,12 @@ def test_parse_at_cursor_single_line_inside_brackets_beginning(offset,
     expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a, b, c, d', expected_args):
         _assert_equal(
-            buffer_parser.parse_at_cursor((1, len(offset) + len(text_beginning) + 1), buffer),
-            ParsedRange(0, 0, len(offset), offset + text_beginning + '(', expected_args, ')'))
+            buffer_parser.signature_at_cursor((1, len(offset) + len(text_beginning) + 1), buffer),
+            Signature(0, 0, len(offset), offset + text_beginning + '(', expected_args, ')'))
 
 @pytest.mark.parametrize('text_ending', ['', ' #test'])
-def test_parse_at_cursor_single_line_inside_brackets_ending(text_ending, arrange_parse_args_line):
+def test_signature_at_cursor_single_line_inside_brackets_ending(text_ending,
+                                                                arrange_parse_args_line):
     '''
     GIVEN function invocation occupies single line
     AND ending text is of varied length
@@ -76,11 +77,11 @@ def test_parse_at_cursor_single_line_inside_brackets_ending(text_ending, arrange
     expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a, b, c, d', expected_args):
         _assert_equal(
-            buffer_parser.parse_at_cursor((1, 23), buffer),
-            ParsedRange(0, 0, 0, 'this_is_test_function(', expected_args, ')' + text_ending))
+            buffer_parser.signature_at_cursor((1, 23), buffer),
+            Signature(0, 0, 0, 'this_is_test_function(', expected_args, ')' + text_ending))
 
 @pytest.mark.parametrize('cursor_col', [0, 21, 23, 32, 36])
-def test_parse_at_cursor_single_line_cursor_positions(cursor_col, arrange_parse_args_line):
+def test_signature_at_cursor_single_line_cursor_positions(cursor_col, arrange_parse_args_line):
     '''
     GIVEN function invocation occupies single line
     AND some text is present at the end
@@ -93,15 +94,15 @@ def test_parse_at_cursor_single_line_cursor_positions(cursor_col, arrange_parse_
     expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a, b, c, d', expected_args):
         _assert_equal(
-            buffer_parser.parse_at_cursor((1, cursor_col), buffer),
-            ParsedRange(0, 0, 0, 'this_is_test_function(', expected_args, ') #test'))
+            buffer_parser.signature_at_cursor((1, cursor_col), buffer),
+            Signature(0, 0, 0, 'this_is_test_function(', expected_args, ') #test'))
 
 @pytest.mark.parametrize(
     ['offset', 'text_beginning'],
     [('', ''), ('    ', 'test'), ('  ', '')])
-def test_parse_at_cursor_two_lines_inside_brackets_beginning(offset,
-                                                             text_beginning,
-                                                             arrange_parse_args_line):
+def test_signature_at_cursor_two_lines_inside_brackets_beginning(offset,
+                                                                 text_beginning,
+                                                                 arrange_parse_args_line):
     '''
     GIVEN function invocation occupies two lines
     AND beginning text is of varied length
@@ -115,11 +116,11 @@ def test_parse_at_cursor_two_lines_inside_brackets_beginning(offset,
     expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a, b,   c, d', expected_args):
         _assert_equal(
-            buffer_parser.parse_at_cursor((2, 0), buffer),
-            ParsedRange(0, 1, len(offset), offset + text_beginning + '(', expected_args, ')'))
+            buffer_parser.signature_at_cursor((2, 0), buffer),
+            Signature(0, 1, len(offset), offset + text_beginning + '(', expected_args, ')'))
 
 @pytest.mark.parametrize('text_ending', ['', ' #test'])
-def test_parse_at_cursor_two_lines_inside_brackets_ending(text_ending, arrange_parse_args_line):
+def test_signature_at_cursor_two_lines_inside_brackets_ending(text_ending, arrange_parse_args_line):
     '''
     GIVEN function invocation occupies two lines
     AND ending text is of varied length
@@ -132,15 +133,15 @@ def test_parse_at_cursor_two_lines_inside_brackets_ending(text_ending, arrange_p
     expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('    a, b, c, d', expected_args):
         _assert_equal(
-            buffer_parser.parse_at_cursor((2, 0), buffer),
-            ParsedRange(0, 1, 0, 'this_is_test_function(', expected_args, ')' + text_ending))
+            buffer_parser.signature_at_cursor((2, 0), buffer),
+            Signature(0, 1, 0, 'this_is_test_function(', expected_args, ')' + text_ending))
 
 @pytest.mark.parametrize(
     ['cursor_row', 'cursor_col'],
     [(1, 0), (1, 21), (1, 23), (2, 0), (2, 5), (2, 7)])
-def test_parse_at_cursor_two_lines_cursor_positions(cursor_row,
-                                                    cursor_col,
-                                                    arrange_parse_args_line):
+def test_signature_at_cursor_two_lines_cursor_positions(cursor_row,
+                                                        cursor_col,
+                                                        arrange_parse_args_line):
     '''
     GIVEN function invocation occupies two lines
     AND some text is present at the end
@@ -154,15 +155,15 @@ def test_parse_at_cursor_two_lines_cursor_positions(cursor_row,
     expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a, b,  c, d', expected_args):
         _assert_equal(
-            buffer_parser.parse_at_cursor((cursor_row, cursor_col), buffer),
-            ParsedRange(0, 1, 0, 'this_is_test_function(', expected_args, ') #test'))
+            buffer_parser.signature_at_cursor((cursor_row, cursor_col), buffer),
+            Signature(0, 1, 0, 'this_is_test_function(', expected_args, ') #test'))
 
 @pytest.mark.parametrize(
     ['offset', 'text_beginning'],
     [('', ''), ('    ', 'test'), ('  ', '')])
-def test_parse_at_cursor_multiple_lines_inside_brackets_beginning(offset,
-                                                                  text_beginning,
-                                                                  arrange_parse_args_line):
+def test_signature_at_cursor_multiple_lines_inside_brackets_beginning(offset,
+                                                                      text_beginning,
+                                                                      arrange_parse_args_line):
     '''
     GIVEN function invocation occupies multiple lines
     AND beginning text is of varied length
@@ -178,12 +179,12 @@ def test_parse_at_cursor_multiple_lines_inside_brackets_beginning(offset,
     expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a,   b,   c,    d', expected_args):
         _assert_equal(
-            buffer_parser.parse_at_cursor((2, 0), buffer),
-            ParsedRange(0, 3, len(offset), offset + text_beginning + '(', expected_args, ')'))
+            buffer_parser.signature_at_cursor((2, 0), buffer),
+            Signature(0, 3, len(offset), offset + text_beginning + '(', expected_args, ')'))
 
 @pytest.mark.parametrize('text_ending', ['', ' #test'])
-def test_parse_at_cursor_multiple_lines_inside_brackets_ending(text_ending,
-                                                               arrange_parse_args_line):
+def test_signature_at_cursor_multiple_lines_inside_brackets_ending(text_ending,
+                                                                   arrange_parse_args_line):
     '''
     GIVEN function invocation occupies multiple lines
     AND ending text is of varied length
@@ -198,15 +199,15 @@ def test_parse_at_cursor_multiple_lines_inside_brackets_ending(text_ending,
     expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('    a,     b,     c, d', expected_args):
         _assert_equal(
-            buffer_parser.parse_at_cursor((2, 0), buffer),
-            ParsedRange(0, 3, 0, 'this_is_test_function(', expected_args, ')' + text_ending))
+            buffer_parser.signature_at_cursor((2, 0), buffer),
+            Signature(0, 3, 0, 'this_is_test_function(', expected_args, ')' + text_ending))
 
 @pytest.mark.parametrize(
     ['cursor_row', 'cursor_col'],
     [(1, 0), (1, 21), (1, 23), (2, 0), (2, 2), (3, 1), (4, 3)])
-def test_parse_at_cursor_multiple_lines_cursor_positions(cursor_row,
-                                                         cursor_col,
-                                                         arrange_parse_args_line):
+def test_signature_at_cursor_multiple_lines_cursor_positions(cursor_row,
+                                                             cursor_col,
+                                                             arrange_parse_args_line):
     '''
     GIVEN function invocation occupies multiple lines
     AND some text is present at the end
@@ -222,8 +223,8 @@ def test_parse_at_cursor_multiple_lines_cursor_positions(cursor_row,
     expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a,b,  c, d', expected_args):
         _assert_equal(
-            buffer_parser.parse_at_cursor((cursor_row, cursor_col), buffer),
-            ParsedRange(0, 3, 0, 'this_is_test_function(', expected_args, ') #test'))
+            buffer_parser.signature_at_cursor((cursor_row, cursor_col), buffer),
+            Signature(0, 3, 0, 'this_is_test_function(', expected_args, ') #test'))
 
 @pytest.mark.parametrize(
     ['cursor_row', 'cursor_col'],
@@ -244,8 +245,8 @@ def test_extra_brackets(cursor_row, cursor_col, arrange_parse_args_line):
     with arrange_parse_args_line(
             '(a) + (b),     (b + c), d,    (f)', expected_args):
         _assert_equal(
-            buffer_parser.parse_at_cursor((cursor_row, cursor_col), buffer),
-            ParsedRange(0, 2, 0, 'test(', expected_args, ') # comment'))
+            buffer_parser.signature_at_cursor((cursor_row, cursor_col), buffer),
+            Signature(0, 2, 0, 'test(', expected_args, ') # comment'))
 
 @pytest.mark.parametrize(
     ['cursor_row', 'cursor_col'],
@@ -270,11 +271,11 @@ def test_nested_invocations_with_square_brackets(cursor_row, cursor_col, arrange
     expected_args = ('n_1(a)(a1)', 'n_2(n_3(b))[0]', 'n_4(c)')
     with arrange_parse_args_line('    n_1(a)(a1),    n_2(n_3(b))[0],    n_4(c)', expected_args):
         _assert_equal(
-            buffer_parser.parse_at_cursor((cursor_row, cursor_col), buffer),
-            ParsedRange(0, 3, 0, 'test(', expected_args, ')'))
+            buffer_parser.signature_at_cursor((cursor_row, cursor_col), buffer),
+            Signature(0, 3, 0, 'test(', expected_args, ')'))
 
-def _assert_equal(actual: ParsedRange, expected: ParsedRange) -> None:
+def _assert_equal(actual: Signature, expected: Signature) -> None:
     assert actual == expected
 
-def _assert_empty(actual: ParsedRange) -> None:
+def _assert_empty(actual: Signature) -> None:
     assert actual.args == ()
