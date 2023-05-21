@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 from abc import ABC, abstractmethod
 
 from app.buffer_parser import signature_at_cursor, Signature
@@ -33,9 +33,8 @@ class ArgWrapperBase(ABC):
     def _lines_needed(self, args_count: int) -> int:
         pass
 
-    # TODO: consider removing Optional
-    def _get_offset(self, indent: Optional[int] = None) -> str:
-        return ' '*(self._indent if indent is None else indent)
+    def _get_offset(self, indent: int = 0) -> str:
+        return ' ' * (indent or self._indent)
 
     def _allocate_lines(self, signature: Signature, buffer: 'Buffer') -> None:
         lines_occupied = signature.rows.end - signature.rows.start + 1
