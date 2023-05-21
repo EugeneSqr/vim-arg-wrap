@@ -13,7 +13,7 @@ class ArgWrapperA(ArgWrapperBase):
         method_invocation(
             a, b, c)
         '''
-        second_line = (self._get_offset(signature.start_row_indent) + self._get_offset() +
+        second_line = (self._get_offset(signature.rows.start_indent) + self._get_offset() +
                        ', '.join(signature.args) + signature.ending)
         buffer[signature.rows.start] = signature.beginning
         buffer[signature.rows.start + 1] = second_line

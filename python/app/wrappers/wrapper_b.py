@@ -16,7 +16,7 @@ class ArgWrapperB(ArgWrapperBase):
            c)
         '''
         buffer[signature.rows.start] = signature.beginning
-        range_offset = self._get_offset() + self._get_offset(signature.start_row_indent)
+        range_offset = self._get_offset() + self._get_offset(signature.rows.start_indent)
         for arg_index, arg in enumerate(signature.args):
             arg_line = _build_arg_line(
                 arg,

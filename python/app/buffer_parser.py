@@ -11,12 +11,11 @@ if TYPE_CHECKING:
 class RowsRange:
     start: int = 0
     end: int = 0
+    start_indent: int = 0
 
 @dataclass
 class Signature:
     rows: RowsRange = RowsRange()
-    # TODO: consider moving start_rows_index to RowsRange signature.rows.start_indent
-    start_row_indent: int = 0
     beginning: str = ""
     args: Tuple[str, ...] = ()
     ending: str = ""
@@ -32,8 +31,7 @@ def signature_at_cursor(cursor: Cursor, buffer: 'Buffer') -> Signature:
     args_start = start_col + 1
     args_end = args_start + buffer_range_len - len(beginning) - len(ending)
     return Signature(
-        rows=RowsRange(start_row, end_row),
-        start_row_indent=_get_line_indent(buffer[start_row]),
+        rows=RowsRange(start_row, end_row, _get_line_indent(buffer[start_row])),
         beginning=beginning,
         args=parse_args_line(''.join(buffer[start_row:end_row + 1])[args_start:args_end]),
         ending=ending)

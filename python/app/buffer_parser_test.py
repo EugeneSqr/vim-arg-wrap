@@ -57,12 +57,12 @@ def test_signature_at_cursor_single_line_inside_brackets_beginning(offset,
     THEN the data is extracted correctly
     '''
     buffer = [offset + text_beginning + '(a, b, c, d)']
-    rows_range = RowsRange(0, 0)
+    rows_range = RowsRange(0, 0, len(offset))
     expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a, b, c, d', expected_args):
         _assert_equal(
             buffer_parser.signature_at_cursor((1, len(offset) + len(text_beginning) + 1), buffer),
-            Signature(rows_range, len(offset), offset + text_beginning + '(', expected_args, ')'))
+            Signature(rows_range, offset + text_beginning + '(', expected_args, ')'))
 
 @pytest.mark.parametrize('text_ending', ['', ' #test'])
 def test_signature_at_cursor_single_line_inside_brackets_ending(text_ending,
@@ -75,12 +75,12 @@ def test_signature_at_cursor_single_line_inside_brackets_ending(text_ending,
     THEN the data is extracted correctly
     '''
     buffer = ['this_is_test_function(a, b, c, d)' + text_ending]
-    rows_range = RowsRange(0, 0)
+    rows_range = RowsRange(0, 0, 0)
     expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a, b, c, d', expected_args):
         _assert_equal(
             buffer_parser.signature_at_cursor((1, 23), buffer),
-            Signature(rows_range, 0, 'this_is_test_function(', expected_args, ')' + text_ending))
+            Signature(rows_range, 'this_is_test_function(', expected_args, ')' + text_ending))
 
 @pytest.mark.parametrize('cursor_col', [0, 21, 23, 32, 36])
 def test_signature_at_cursor_single_line_cursor_positions(cursor_col, arrange_parse_args_line):
@@ -93,12 +93,12 @@ def test_signature_at_cursor_single_line_cursor_positions(cursor_col, arrange_pa
     AND result does not depend on cursor position
     '''
     buffer = ['this_is_test_function(a, b, c, d) #test']
-    rows_range = RowsRange(0, 0)
+    rows_range = RowsRange(0, 0, 0)
     expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a, b, c, d', expected_args):
         _assert_equal(
             buffer_parser.signature_at_cursor((1, cursor_col), buffer),
-            Signature(rows_range, 0, 'this_is_test_function(', expected_args, ') #test'))
+            Signature(rows_range, 'this_is_test_function(', expected_args, ') #test'))
 
 @pytest.mark.parametrize(
     ['offset', 'text_beginning'],
@@ -116,12 +116,12 @@ def test_signature_at_cursor_two_lines_inside_brackets_beginning(offset,
     '''
     buffer = [offset + text_beginning + '(a, b,',
               '   c, d)']
-    rows_range = RowsRange(0, 1)
+    rows_range = RowsRange(0, 1, len(offset))
     expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a, b,   c, d', expected_args):
         _assert_equal(
             buffer_parser.signature_at_cursor((2, 0), buffer),
-            Signature(rows_range, len(offset), offset + text_beginning + '(', expected_args, ')'))
+            Signature(rows_range, offset + text_beginning + '(', expected_args, ')'))
 
 @pytest.mark.parametrize('text_ending', ['', ' #test'])
 def test_signature_at_cursor_two_lines_inside_brackets_ending(text_ending, arrange_parse_args_line):
@@ -134,12 +134,12 @@ def test_signature_at_cursor_two_lines_inside_brackets_ending(text_ending, arran
     '''
     buffer = ['this_is_test_function(',
               '    a, b, c, d)' + text_ending]
-    rows_range = RowsRange(0, 1)
+    rows_range = RowsRange(0, 1, 0)
     expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('    a, b, c, d', expected_args):
         _assert_equal(
             buffer_parser.signature_at_cursor((2, 0), buffer),
-            Signature(rows_range, 0, 'this_is_test_function(', expected_args, ')' + text_ending))
+            Signature(rows_range, 'this_is_test_function(', expected_args, ')' + text_ending))
 
 @pytest.mark.parametrize(
     ['cursor_row', 'cursor_col'],
@@ -161,7 +161,7 @@ def test_signature_at_cursor_two_lines_cursor_positions(cursor_row,
     with arrange_parse_args_line('a, b,  c, d', expected_args):
         _assert_equal(
             buffer_parser.signature_at_cursor((cursor_row, cursor_col), buffer),
-            Signature(RowsRange(0, 1), 0, 'this_is_test_function(', expected_args, ') #test'))
+            Signature(RowsRange(0, 1, 0), 'this_is_test_function(', expected_args, ') #test'))
 
 @pytest.mark.parametrize(
     ['offset', 'text_beginning'],
@@ -181,12 +181,12 @@ def test_signature_at_cursor_multiple_lines_inside_brackets_beginning(offset,
               '   b,',
               '   c, ',
               '   d)']
-    rows_range = RowsRange(0, 3)
+    rows_range = RowsRange(0, 3, len(offset))
     expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a,   b,   c,    d', expected_args):
         _assert_equal(
             buffer_parser.signature_at_cursor((2, 0), buffer),
-            Signature(rows_range, len(offset), offset + text_beginning + '(', expected_args, ')'))
+            Signature(rows_range, offset + text_beginning + '(', expected_args, ')'))
 
 @pytest.mark.parametrize('text_ending', ['', ' #test'])
 def test_signature_at_cursor_multiple_lines_inside_brackets_ending(text_ending,
@@ -202,12 +202,12 @@ def test_signature_at_cursor_multiple_lines_inside_brackets_ending(text_ending,
               '    a, ',
               '    b, ',
               '    c, d)' + text_ending]
-    rows_range = RowsRange(0, 3)
+    rows_range = RowsRange(0, 3, 0)
     expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('    a,     b,     c, d', expected_args):
         _assert_equal(
             buffer_parser.signature_at_cursor((2, 0), buffer),
-            Signature(rows_range, 0, 'this_is_test_function(', expected_args, ')' + text_ending))
+            Signature(rows_range, 'this_is_test_function(', expected_args, ')' + text_ending))
 
 @pytest.mark.parametrize(
     ['cursor_row', 'cursor_col'],
@@ -227,12 +227,12 @@ def test_signature_at_cursor_multiple_lines_cursor_positions(cursor_row,
               'b, ',
               ' c, ',
               'd) #test']
-    rows_range = RowsRange(0, 3)
+    rows_range = RowsRange(0, 3, 0)
     expected_args = ('a', 'b', 'c', 'd')
     with arrange_parse_args_line('a,b,  c, d', expected_args):
         _assert_equal(
             buffer_parser.signature_at_cursor((cursor_row, cursor_col), buffer),
-            Signature(rows_range, 0, 'this_is_test_function(', expected_args, ') #test'))
+            Signature(rows_range, 'this_is_test_function(', expected_args, ') #test'))
 
 @pytest.mark.parametrize(
     ['cursor_row', 'cursor_col'],
@@ -254,7 +254,7 @@ def test_extra_brackets(cursor_row, cursor_col, arrange_parse_args_line):
             '(a) + (b),     (b + c), d,    (f)', expected_args):
         _assert_equal(
             buffer_parser.signature_at_cursor((cursor_row, cursor_col), buffer),
-            Signature(RowsRange(0, 2), 0, 'test(', expected_args, ') # comment'))
+            Signature(RowsRange(0, 2, 0), 'test(', expected_args, ') # comment'))
 
 @pytest.mark.parametrize(
     ['cursor_row', 'cursor_col'],
@@ -280,7 +280,7 @@ def test_nested_invocations_with_square_brackets(cursor_row, cursor_col, arrange
     with arrange_parse_args_line('    n_1(a)(a1),    n_2(n_3(b))[0],    n_4(c)', expected_args):
         _assert_equal(
             buffer_parser.signature_at_cursor((cursor_row, cursor_col), buffer),
-            Signature(RowsRange(0, 3), 0, 'test(', expected_args, ')'))
+            Signature(RowsRange(0, 3, 0), 'test(', expected_args, ')'))
 
 def _assert_equal(actual: Signature, expected: Signature) -> None:
     assert actual == expected
