@@ -1,13 +1,9 @@
-from typing import TYPE_CHECKING
-
 from app.buffer_parser import Signature
+from app.types import VimBuffer
 from .wrapper_base import ArgWrapperBase
 
-if TYPE_CHECKING:
-    from vim import Buffer #pylint:disable=import-error
-
 class ArgWrapperA(ArgWrapperBase):
-    def _wrap_args(self, signature: Signature, buffer: 'Buffer') -> None:
+    def _wrap_args(self, signature: Signature, buffer: VimBuffer) -> None:
         '''
         Applies wrap of type A:
         method_invocation(
@@ -18,7 +14,7 @@ class ArgWrapperA(ArgWrapperBase):
         buffer[signature.rows.start] = signature.beginning
         buffer[signature.rows.start + 1] = second_line
 
-    def _recognized(self, signature: Signature, buffer: 'Buffer') -> bool:
+    def _recognized(self, signature: Signature, buffer: VimBuffer) -> bool:
         '''
         Determines if the provided range is wrapped with a type A wrapper
         '''
@@ -28,7 +24,7 @@ class ArgWrapperA(ArgWrapperBase):
     def _lines_needed(self, args_count: int) -> int:
         return 1 if args_count == 0 else 2
 
-def _has_first_argument_in_start_row(signature: Signature, buffer: 'Buffer') -> bool:
+def _has_first_argument_in_start_row(signature: Signature, buffer: VimBuffer) -> bool:
     if not signature.args:
         return False
 

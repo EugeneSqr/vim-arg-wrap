@@ -1,10 +1,11 @@
 import pytest
 
 from app.buffer_parser import Signature, RowsRange
+from app.conftest import VimBufferMock, assert_buffer
 from . import wrapper_b
 
-def test_b_wrap_args_single_line(arrange_vim_buffer, mock_signature_at_cursor):
-    buffer = arrange_vim_buffer([
+def test_b_wrap_args_single_line(mock_signature_at_cursor):
+    buffer = VimBufferMock([
         ' # b begin comment',
         '    def b_func():',
         '        b_method(b_a, b_b, b_c)',
@@ -12,7 +13,7 @@ def test_b_wrap_args_single_line(arrange_vim_buffer, mock_signature_at_cursor):
     ])
     mock_signature_at_cursor(_build_signature(RowsRange(2, 2, 8)))
     wrapper_b.ArgWrapperB(7).wrap_args((3, 1), buffer)
-    assert buffer == [
+    assert_buffer(buffer, [
         ' # b begin comment',
         '    def b_func():',
         '        b_method(',
@@ -20,10 +21,10 @@ def test_b_wrap_args_single_line(arrange_vim_buffer, mock_signature_at_cursor):
         '               b_b,',
         '               b_c)',
         ' # b end comment',
-    ]
+    ])
 
-def test_b_wrap_args_two_lines(arrange_vim_buffer, mock_signature_at_cursor):
-    buffer = arrange_vim_buffer([
+def test_b_wrap_args_two_lines(mock_signature_at_cursor):
+    buffer = VimBufferMock([
         ' # b begin comment',
         '    def b_func():',
         '        b_method(',
@@ -32,7 +33,7 @@ def test_b_wrap_args_two_lines(arrange_vim_buffer, mock_signature_at_cursor):
     ])
     mock_signature_at_cursor(_build_signature(RowsRange(2, 3, 8)))
     wrapper_b.ArgWrapperB(0).wrap_args((4, 0), buffer)
-    assert buffer == [
+    assert_buffer(buffer, [
         ' # b begin comment',
         '    def b_func():',
         '        b_method(',
@@ -40,10 +41,10 @@ def test_b_wrap_args_two_lines(arrange_vim_buffer, mock_signature_at_cursor):
         '        b_b,',
         '        b_c)',
         ' # b end comment',
-    ]
+    ])
 
-def test_b_wrap_args_multiple_lines(arrange_vim_buffer, mock_signature_at_cursor):
-    buffer = arrange_vim_buffer([
+def test_b_wrap_args_multiple_lines(mock_signature_at_cursor):
+    buffer = VimBufferMock([
         ' # b begin comment',
         '    def b_func():',
         '        b_method(',
@@ -54,7 +55,7 @@ def test_b_wrap_args_multiple_lines(arrange_vim_buffer, mock_signature_at_cursor
     ])
     mock_signature_at_cursor(_build_signature(RowsRange(2, 5, 8)))
     wrapper_b.ArgWrapperB(4).wrap_args((6, 0), buffer)
-    assert buffer == [
+    assert_buffer(buffer, [
         ' # b begin comment',
         '    def b_func():',
         '        b_method(',
@@ -62,10 +63,10 @@ def test_b_wrap_args_multiple_lines(arrange_vim_buffer, mock_signature_at_cursor
         '            b_b,',
         '            b_c)',
         ' # b end comment',
-    ]
+    ])
 
-def test_b_wrap_args_multiple_lines_below_first(arrange_vim_buffer, mock_signature_at_cursor):
-    buffer = arrange_vim_buffer([
+def test_b_wrap_args_multiple_lines_below_first(mock_signature_at_cursor):
+    buffer = VimBufferMock([
         ' # b begin comment',
         '    def b_func():',
         '        b_method(b_a,',
@@ -75,7 +76,7 @@ def test_b_wrap_args_multiple_lines_below_first(arrange_vim_buffer, mock_signatu
     ])
     mock_signature_at_cursor(_build_signature(RowsRange(2, 4, 8)))
     wrapper_b.ArgWrapperB(2).wrap_args((5, 0), buffer)
-    assert buffer == [
+    assert_buffer(buffer, [
         ' # b begin comment',
         '    def b_func():',
         '        b_method(',
@@ -83,7 +84,7 @@ def test_b_wrap_args_multiple_lines_below_first(arrange_vim_buffer, mock_signatu
         '          b_b,',
         '          b_c)',
         ' # b end comment',
-    ]
+    ])
 
 def test_b_recognizes_b(mock_signature_at_cursor):
     mock_signature_at_cursor(_build_signature(RowsRange(2, 5, 0)))

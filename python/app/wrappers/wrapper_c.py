@@ -1,13 +1,9 @@
-from typing import TYPE_CHECKING
-
+from app.types import VimBuffer
 from app.buffer_parser import Signature
 from .wrapper_base import ArgWrapperBase
 
-if TYPE_CHECKING:
-    from vim import Buffer #pylint:disable=import-error
-
 class ArgWrapperC(ArgWrapperBase):
-    def _wrap_args(self, signature: Signature, buffer: 'Buffer') -> None:
+    def _wrap_args(self, signature: Signature, buffer: VimBuffer) -> None:
         '''
         Applies wrap of type C:
         method_invocation(a,
@@ -23,7 +19,7 @@ class ArgWrapperC(ArgWrapperBase):
                 ',' if arg_index < len(signature.args) - 1 else signature.ending)
             buffer[signature.rows.start + arg_index] = arg_line
 
-    def _recognized(self, signature: Signature, buffer: 'Buffer') -> bool:
+    def _recognized(self, signature: Signature, buffer: VimBuffer) -> bool:
         '''
         Determines if the provided range is wrapped with a type C wrapper
         '''

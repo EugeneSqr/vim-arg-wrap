@@ -1,10 +1,11 @@
 import pytest
 
 from app.buffer_parser import Signature, RowsRange
+from app.conftest import VimBufferMock, assert_buffer
 from . import wrapper_nowrap
 
-def test_nowrap_wrap_args_single_line(arrange_vim_buffer, mock_signature_at_cursor):
-    buffer = arrange_vim_buffer([
+def test_nowrap_wrap_args_single_line(mock_signature_at_cursor):
+    buffer = VimBufferMock([
         ' # nowrap begin comment',
         '    def nowrap_func():',
         '        nowrap_method(nowrap_a, nowrap_b, nowrap_c)',
@@ -12,15 +13,15 @@ def test_nowrap_wrap_args_single_line(arrange_vim_buffer, mock_signature_at_curs
     ])
     mock_signature_at_cursor(_build_signature(RowsRange(2, 2, 6)))
     wrapper_nowrap.ArgWrapperNoWrap(3).wrap_args((2, 0), buffer)
-    assert buffer == [
+    assert_buffer(buffer, [
         ' # nowrap begin comment',
         '    def nowrap_func():',
         '        nowrap_method(nowrap_a, nowrap_b, nowrap_c)',
         ' # nowrap end comment',
-    ]
+    ])
 
-def test_nowrap_wrap_args_two_lines(arrange_vim_buffer, mock_signature_at_cursor):
-    buffer = arrange_vim_buffer([
+def test_nowrap_wrap_args_two_lines(mock_signature_at_cursor):
+    buffer = VimBufferMock([
         ' # nowrap begin comment',
         '    def nowrap_func():',
         '        nowrap_method(',
@@ -29,15 +30,15 @@ def test_nowrap_wrap_args_two_lines(arrange_vim_buffer, mock_signature_at_cursor
     ])
     mock_signature_at_cursor(_build_signature(RowsRange(2, 3, 8)))
     wrapper_nowrap.ArgWrapperNoWrap(4).wrap_args((4, 0), buffer)
-    assert buffer == [
+    assert_buffer(buffer, [
         ' # nowrap begin comment',
         '    def nowrap_func():',
         '        nowrap_method(nowrap_a, nowrap_b, nowrap_c)',
         ' # nowrap end comment',
-    ]
+    ])
 
-def test_nowrap_wrap_args_multiple_lines(arrange_vim_buffer, mock_signature_at_cursor):
-    buffer = arrange_vim_buffer([
+def test_nowrap_wrap_args_multiple_lines(mock_signature_at_cursor):
+    buffer = VimBufferMock([
         ' # nowrap begin comment',
         '    def nowrap_func():',
         '        nowrap_method(',
@@ -48,15 +49,15 @@ def test_nowrap_wrap_args_multiple_lines(arrange_vim_buffer, mock_signature_at_c
     ])
     mock_signature_at_cursor(_build_signature(RowsRange(2, 5, 8)))
     wrapper_nowrap.ArgWrapperNoWrap(4).wrap_args((6, 0), buffer)
-    assert buffer == [
+    assert_buffer(buffer, [
         ' # nowrap begin comment',
         '    def nowrap_func():',
         '        nowrap_method(nowrap_a, nowrap_b, nowrap_c)',
         ' # nowrap end comment',
-    ]
+    ])
 
-def test_nowrap_wrap_args_multiple_lines_below_first(arrange_vim_buffer, mock_signature_at_cursor):
-    buffer = arrange_vim_buffer([
+def test_nowrap_wrap_args_multiple_lines_below_first(mock_signature_at_cursor):
+    buffer = VimBufferMock([
         ' # nowrap begin comment',
         '    def nowrap_func():',
         '        nowrap_method(nowrap_a,',
@@ -66,12 +67,12 @@ def test_nowrap_wrap_args_multiple_lines_below_first(arrange_vim_buffer, mock_si
     ])
     mock_signature_at_cursor(_build_signature(RowsRange(2, 4, 8)))
     wrapper_nowrap.ArgWrapperNoWrap(4).wrap_args((5, 0), buffer)
-    assert buffer == [
+    assert_buffer(buffer, [
         ' # nowrap begin comment',
         '    def nowrap_func():',
         '        nowrap_method(nowrap_a, nowrap_b, nowrap_c)',
         ' # nowrap end comment',
-    ]
+    ])
 
 def test_nowrap_recognizes_nowrap(mock_signature_at_cursor):
     mock_signature_at_cursor(_build_signature(RowsRange(2, 2, 8)))

@@ -1,11 +1,8 @@
-from typing import TYPE_CHECKING, Optional, Tuple
+from typing import Optional, Tuple
 from dataclasses import dataclass
 
-from app.types import Cursor
+from app.types import Cursor, VimBuffer
 from .args_parser import parse_args_line
-
-if TYPE_CHECKING:
-    from vim import Buffer #pylint:disable=import-error
 
 @dataclass
 class RowsRange:
@@ -20,7 +17,7 @@ class Signature:
     args: Tuple[str, ...] = ()
     ending: str = ""
 
-def signature_at_cursor(cursor: Cursor, buffer: 'Buffer') -> Signature:
+def signature_at_cursor(cursor: Cursor, buffer: VimBuffer) -> Signature:
     args_range = _get_args_range(cursor, buffer)
     if not args_range:
         return Signature()
@@ -38,7 +35,7 @@ def signature_at_cursor(cursor: Cursor, buffer: 'Buffer') -> Signature:
 
 # TODO: consider removing Optional
 def _get_args_range(cursor: Cursor,
-                    buffer: 'Buffer') -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
+                    buffer: VimBuffer) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
     last_bracket_index = _get_last_closing_bracket_index(cursor, buffer)
     if not last_bracket_index:
         return None
@@ -53,7 +50,7 @@ def _cursor_to_index(cursor: Cursor) -> Tuple[int, int]:
     return row - 1, col
 
 # TODO: consider removing Optional
-def _get_last_closing_bracket_index(cursor: Cursor, buffer: 'Buffer') -> Optional[Tuple[int, int]]:
+def _get_last_closing_bracket_index(cursor: Cursor, buffer: VimBuffer) -> Optional[Tuple[int, int]]:
     row_index, _ = _cursor_to_index(cursor)
     for current_row_index in range(row_index, len(buffer)):
         line = buffer[current_row_index]
@@ -76,7 +73,7 @@ def _is_ending_commented_out(line: str, index: int) -> bool:
     return line[index] not in [',', '(', '[']
 
 def _get_first_opening_bracket_index(last_closing_bracket_index: Optional[Tuple[int, int]],
-                                     buffer: 'Buffer') -> Optional[Tuple[int, int]]:
+                                     buffer: VimBuffer) -> Optional[Tuple[int, int]]:
     if last_closing_bracket_index is None:
         return None
     row_index, col_index = last_closing_bracket_index
