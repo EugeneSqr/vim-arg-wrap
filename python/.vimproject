@@ -3,6 +3,6 @@ let w:vimProjectName = "vim-arg-wrap"
 set wildignore+=**/__pycache__/**
 nnoremap <leader>t :w<CR> :exe "!pytest"<CR>
 nnoremap <leader>T :w<CR> :TestNearest<CR>
-nnoremap <leader>l :w<CR> :exe "!./run_lint"<CR>
+nnoremap <leader>l :w<CR> :exe "!./run_lint --typing"<CR>
 
 set colorcolumn=100
