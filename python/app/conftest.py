@@ -38,6 +38,6 @@ class VimBufferMock():
         nr = nr if nr is not None else len(self._rows)
         self._rows = self._rows[:nr] + str_ + self._rows[nr:]
 
-def assert_buffer(actual: VimBuffer, expected: List[str]):
+def assert_buffer(actual: VimBuffer, expected: List[str]) -> None:
     for index in range(0, len(actual)):
         assert actual[index] == expected[index]
