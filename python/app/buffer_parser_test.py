@@ -1,4 +1,4 @@
-from typing import List, Iterator, Union, Tuple
+from typing import Iterator, Tuple
 from contextlib import contextmanager
 from unittest.mock import Mock
 

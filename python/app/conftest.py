@@ -1,10 +1,10 @@
-from typing import List, Iterator, Union, Callable, Optional
+from typing import List, Iterator, Union, Callable, Optional, overload
 from unittest.mock import Mock
 
 import pytest
 from pytest import MonkeyPatch
 
-from app.types import VimBuffer, TKey
+from app.types import VimBuffer
 from app.wrappers import wrapper_base
 from app.buffer_parser import Signature
 
@@ -22,13 +22,21 @@ class VimBufferMock():
     def __iter__(self) -> Iterator[str]:
         return iter(self._rows)
 
-    def __getitem__(self, key: TKey) -> Union[str, List[str]]:
+    @overload
+    def __getitem__(self, key: int) -> str:
+        pass
+
+    @overload
+    def __getitem__(self, key: slice) -> List[str]:
+        pass
+
+    def __getitem__(self, key: Union[int, slice]) -> Union[str, List[str]]:
         return self._rows[key]
 
     def __setitem__(self, key: int, value: str) -> None:
         self._rows[key] = value
 
-    def __delitem__(self, key: TKey) -> None:
+    def __delitem__(self, key: Union[int, slice]) -> None:
         del self._rows[key]
 
     def __len__(self) -> int:
@@ -39,5 +47,5 @@ class VimBufferMock():
         self._rows = self._rows[:nr] + str_ + self._rows[nr:]
 
 def assert_buffer(actual: VimBuffer, expected: List[str]) -> None:
-    for index in range(0, len(actual)):
-        assert actual[index] == expected[index]
+    for index, line in enumerate(actual):
+        assert line == expected[index]
