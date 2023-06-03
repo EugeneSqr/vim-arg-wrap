@@ -17,6 +17,8 @@ class Signature:
     args: Tuple[str, ...] = ()
     ending: str = ""
 
+BracketPosition = Tuple[int, int]
+
 def signature_at_cursor(cursor: VimCursor, buffer: VimBuffer) -> Signature:
     args_range = _get_args_range(cursor, buffer)
     if not args_range:
@@ -24,7 +26,7 @@ def signature_at_cursor(cursor: VimCursor, buffer: VimBuffer) -> Signature:
     (start_row, start_col), (end_row, end_col) = args_range
     beginning = buffer[start_row][:start_col + 1]
     ending = buffer[end_row][end_col:]
-    buffer_range_len = sum(len(buffer[index]) for index in range(start_row, end_row + 1))
+    buffer_range_len = sum(len(buffer[row]) for row in range(start_row, end_row + 1))
     args_start = start_col + 1
     args_end = args_start + buffer_range_len - len(beginning) - len(ending)
     return Signature(
@@ -33,61 +35,54 @@ def signature_at_cursor(cursor: VimCursor, buffer: VimBuffer) -> Signature:
         args=parse_args_line(''.join(buffer[start_row:end_row + 1])[args_start:args_end]),
         ending=ending)
 
-# TODO: consider removing Optional
 def _get_args_range(cursor: VimCursor,
-                    buffer: VimBuffer) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
-    last_bracket_index = _get_last_closing_bracket_index(cursor, buffer)
-    if not last_bracket_index:
+                    buffer: VimBuffer) -> Optional[Tuple[BracketPosition, BracketPosition]]:
+    last_bracket_position = _get_last_closing_bracket_position(cursor, buffer)
+    if not last_bracket_position:
         return None
-    first_bracket_index = _get_first_opening_bracket_index(last_bracket_index, buffer)
-    if not first_bracket_index:
+    first_bracket_position = _get_first_opening_bracket_position(last_bracket_position, buffer)
+    if not first_bracket_position:
         return None
-    return first_bracket_index, last_bracket_index
+    return first_bracket_position, last_bracket_position
 
-# TODO: consider removing cols to avoid unnecessary Tuples down the road (use Cursor and VimCursor)
-def _cursor_to_index(cursor: VimCursor) -> Tuple[int, int]:
-    row, col = cursor
-    return row - 1, col
-
-# TODO: consider removing Optional
-def _get_last_closing_bracket_index(cursor: VimCursor,
-                                    buffer: VimBuffer) -> Optional[Tuple[int, int]]:
-    row_index, _ = _cursor_to_index(cursor)
-    for current_row_index in range(row_index, len(buffer)):
-        line = buffer[current_row_index]
-        last_bracket_col_index = line.rfind(')', 0, len(line))
-        if last_bracket_col_index != -1:
-            if last_bracket_col_index == len(line) - 1:
-                return current_row_index, last_bracket_col_index
-            ending_col_index = _skip_spaces_after_last_closing_bracket(line, last_bracket_col_index)
-            if _is_ending_commented_out(line, ending_col_index):
-                return current_row_index, last_bracket_col_index
+def _get_last_closing_bracket_position(cursor: VimCursor,
+                                       buffer: VimBuffer) -> Optional[BracketPosition]:
+    row = cursor[0] - 1
+    for current_row in range(row, len(buffer)):
+        line = buffer[current_row]
+        last_bracket_col = line.rfind(')', 0, len(line))
+        if last_bracket_col != -1:
+            if last_bracket_col == len(line) - 1:
+                return current_row, last_bracket_col
+            ending_col = _skip_spaces_after_last_closing_bracket(line, last_bracket_col)
+            if _is_ending_commented_out(line, ending_col):
+                return current_row, last_bracket_col
     return None
 
-def _skip_spaces_after_last_closing_bracket(line: str, index: int) -> int:
-    ending_index = index + 1
-    while ending_index < len(line) and line[ending_index] == ' ':
-        ending_index += 1
-    return ending_index
-
-def _is_ending_commented_out(line: str, index: int) -> bool:
-    return line[index] not in [',', '(', '[']
-
-def _get_first_opening_bracket_index(last_closing_bracket_index: Optional[Tuple[int, int]],
-                                     buffer: VimBuffer) -> Optional[Tuple[int, int]]:
-    if last_closing_bracket_index is None:
+def _get_first_opening_bracket_position(last_closing_bracket_position: Optional[BracketPosition],
+                                        buffer: VimBuffer) -> Optional[BracketPosition]:
+    if last_closing_bracket_position is None:
         return None
-    row_index, col_index = last_closing_bracket_index
+    row, col = last_closing_bracket_position
     bracket_balance = 0
-    for current_row_index in range(row_index, -1, -1):
-        line = buffer[current_row_index]
-        if current_row_index != row_index:
-            col_index = len(line) - 1
-        for current_col_index in range(col_index, -1, -1):
-            bracket_balance = _update_bracket_balance(line[current_col_index], bracket_balance)
+    for current_row in range(row, -1, -1):
+        line = buffer[current_row]
+        if current_row != row:
+            col = len(line) - 1
+        for current_col in range(col, -1, -1):
+            bracket_balance = _update_bracket_balance(line[current_col], bracket_balance)
             if bracket_balance == 0:
-                return current_row_index, current_col_index
+                return current_row, current_col
     return None
+
+def _skip_spaces_after_last_closing_bracket(line: str, col: int) -> int:
+    ending_col = col + 1
+    while ending_col < len(line) and line[ending_col] == ' ':
+        ending_col += 1
+    return ending_col
+
+def _is_ending_commented_out(line: str, col: int) -> bool:
+    return line[col] not in [',', '(', '[']
 
 def _update_bracket_balance(current_char: str, bracket_balance: int) -> int:
     if current_char == '(':
