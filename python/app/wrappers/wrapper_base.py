@@ -45,7 +45,3 @@ class ArgWrapperBase(ABC):
 
 def _can_wrap(signature: Signature) -> bool:
     return len(signature.args) > 0
-
-# TODO: remove?
-def _remove_range(signature: Signature, buffer: VimBuffer) -> None:
-    del buffer[signature.rows.start:signature.rows.end + 1]

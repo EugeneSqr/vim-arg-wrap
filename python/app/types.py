@@ -1,4 +1,4 @@
-from typing import Tuple, Protocol, TypeVar, List, Union, Iterator, Optional, overload
+from typing import Tuple, Protocol, List, Union, Iterator, Optional, overload
 
 Cursor = Tuple[int, int]
 
