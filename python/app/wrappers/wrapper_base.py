@@ -1,19 +1,19 @@
 from abc import ABC, abstractmethod
 
 from app.buffer_parser import signature_at_cursor, Signature
-from app.types import Cursor, VimBuffer
+from app.types import VimCursor, VimBuffer
 
 class ArgWrapperBase(ABC):
     def __init__(self, indent: int):
         self._indent = indent
 
-    def wrap_args(self, cursor: Cursor, buffer: VimBuffer) -> None:
+    def wrap_args(self, cursor: VimCursor, buffer: VimBuffer) -> None:
         signature = signature_at_cursor(cursor, buffer)
         if _can_wrap(signature):
             self._allocate_lines(signature, buffer)
             self._wrap_args(signature, buffer)
 
-    def recognized(self, cursor: Cursor, buffer: VimBuffer) -> bool:
+    def recognized(self, cursor: VimCursor, buffer: VimBuffer) -> bool:
         signature = signature_at_cursor(cursor, buffer)
         return _can_wrap(signature) and self._recognized(signature, buffer)
 

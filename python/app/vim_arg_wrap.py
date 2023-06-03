@@ -3,8 +3,6 @@ from vim import current, eval as vim_eval #pylint:disable=import-error
 from .wrappers import init_wrappers
 
 
-# TODO: add typing
-# TODO: add dataclasses
 indent = int(vim_eval('&g:tabstop'))
 _wrappers = init_wrappers(indent)
 

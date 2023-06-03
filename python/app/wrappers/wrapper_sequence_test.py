@@ -4,7 +4,7 @@ from typing import cast
 from app.wrappers import wrapper_sequence
 from app.wrappers.wrapper_base import ArgWrapperBase
 from app.conftest import VimBufferMock
-from app.types import Cursor
+from app.types import VimCursor
 
 def test_first_next_to_second() -> None:
     wrapper_mocks = [
@@ -106,6 +106,6 @@ def _create_wrapper(should_recognize: bool) -> ArgWrapperBase:
     return Mock(spec=ArgWrapperBase, recognized=Mock(return_value=should_recognize))
 
 def _assert_wrap_args_called_once_with(wrapper: ArgWrapperBase,
-                                       cursor: Cursor,
+                                       cursor: VimCursor,
                                        buffer: VimBufferMock) -> None:
     cast(Mock, wrapper.wrap_args).assert_called_once_with(cursor, buffer)

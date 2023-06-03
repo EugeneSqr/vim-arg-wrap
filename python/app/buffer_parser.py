@@ -1,7 +1,7 @@
 from typing import Optional, Tuple
 from dataclasses import dataclass
 
-from app.types import Cursor, VimBuffer
+from app.types import VimCursor, VimBuffer
 from .args_parser import parse_args_line
 
 @dataclass
@@ -17,7 +17,7 @@ class Signature:
     args: Tuple[str, ...] = ()
     ending: str = ""
 
-def signature_at_cursor(cursor: Cursor, buffer: VimBuffer) -> Signature:
+def signature_at_cursor(cursor: VimCursor, buffer: VimBuffer) -> Signature:
     args_range = _get_args_range(cursor, buffer)
     if not args_range:
         return Signature()
@@ -34,7 +34,7 @@ def signature_at_cursor(cursor: Cursor, buffer: VimBuffer) -> Signature:
         ending=ending)
 
 # TODO: consider removing Optional
-def _get_args_range(cursor: Cursor,
+def _get_args_range(cursor: VimCursor,
                     buffer: VimBuffer) -> Optional[Tuple[Tuple[int, int], Tuple[int, int]]]:
     last_bracket_index = _get_last_closing_bracket_index(cursor, buffer)
     if not last_bracket_index:
@@ -44,13 +44,14 @@ def _get_args_range(cursor: Cursor,
         return None
     return first_bracket_index, last_bracket_index
 
-# TODO: consider removing cols to avoid unnecessary Tuples down the road
-def _cursor_to_index(cursor: Cursor) -> Tuple[int, int]:
+# TODO: consider removing cols to avoid unnecessary Tuples down the road (use Cursor and VimCursor)
+def _cursor_to_index(cursor: VimCursor) -> Tuple[int, int]:
     row, col = cursor
     return row - 1, col
 
 # TODO: consider removing Optional
-def _get_last_closing_bracket_index(cursor: Cursor, buffer: VimBuffer) -> Optional[Tuple[int, int]]:
+def _get_last_closing_bracket_index(cursor: VimCursor,
+                                    buffer: VimBuffer) -> Optional[Tuple[int, int]]:
     row_index, _ = _cursor_to_index(cursor)
     for current_row_index in range(row_index, len(buffer)):
         line = buffer[current_row_index]

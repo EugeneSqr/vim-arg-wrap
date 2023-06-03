@@ -1,6 +1,6 @@
 from typing import Tuple, Protocol, List, Union, Iterator, Optional, overload
 
-Cursor = Tuple[int, int]
+VimCursor = Tuple[int, int]
 
 class VimBuffer(Protocol):
     def __iter__(self) -> Iterator[str]:

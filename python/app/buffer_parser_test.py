@@ -8,7 +8,7 @@ from pytest import MonkeyPatch
 from . import buffer_parser
 from .buffer_parser import Signature, RowsRange
 from .conftest import VimBufferMock
-from .types import Cursor
+from .types import VimCursor
 
 @pytest.fixture(name='arrange')
 def fixture_arrange(monkeypatch: MonkeyPatch) -> Mock:
@@ -144,7 +144,7 @@ def test_signature_at_cursor_two_lines_inside_brackets_ending(text_ending: str,
             Signature(rows_range, 'this_is_test_function(', expected_args, ')' + text_ending))
 
 @pytest.mark.parametrize('cursor', [(1, 0), (1, 21), (1, 23), (2, 0), (2, 5), (2, 7)])
-def test_signature_at_cursor_two_lines_cursor_positions(cursor: Cursor,
+def test_signature_at_cursor_two_lines_cursor_positions(cursor: VimCursor,
                                                         arrange: Mock) -> None:
     '''
     GIVEN function invocation occupies two lines
@@ -208,7 +208,8 @@ def test_signature_at_cursor_multiple_lines_inside_brackets_ending(text_ending: 
             Signature(rows_range, 'this_is_test_function(', expected_args, ')' + text_ending))
 
 @pytest.mark.parametrize('cursor', [(1, 0), (1, 21), (1, 23), (2, 0), (2, 2), (3, 1), (4, 3)])
-def test_signature_at_cursor_multiple_lines_cursor_positions(cursor: Cursor, arrange: Mock) -> None:
+def test_signature_at_cursor_multiple_lines_cursor_positions(cursor: VimCursor,
+                                                             arrange: Mock) -> None:
     '''
     GIVEN function invocation occupies multiple lines
     AND some text is present at the end
@@ -228,7 +229,7 @@ def test_signature_at_cursor_multiple_lines_cursor_positions(cursor: Cursor, arr
                       Signature(rows_range, 'this_is_test_function(', expected_args, ') #test'))
 
 @pytest.mark.parametrize('cursor', [(1, 0), (1, 5), (1, 7), (2, 5), (3, 0), (3, 5), (3, 8)])
-def test_extra_brackets(cursor: Cursor, arrange: Mock) -> None:
+def test_extra_brackets(cursor: VimCursor, arrange: Mock) -> None:
     '''
     GIVEN function invocation occupies multiple lines
     AND there are a few extra brackets
@@ -246,7 +247,7 @@ def test_extra_brackets(cursor: Cursor, arrange: Mock) -> None:
                       Signature(RowsRange(0, 2, 0), 'test(', expected_args, ') # comment'))
 
 @pytest.mark.parametrize('cursor', [(1, 0), (1, 5), (2, 9), (3, 17), (3, 19), (4, 1)])
-def test_nested_invocations_with_square_brackets(cursor: Cursor, arrange: Mock) -> None:
+def test_nested_invocations_with_square_brackets(cursor: VimCursor, arrange: Mock) -> None:
     '''
     GIVEN function invocation occupies multiple lines
     AND there are a few nested function invocations
