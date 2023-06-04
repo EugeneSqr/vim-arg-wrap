@@ -77,6 +77,27 @@ def test_nowrap_wrap_args_multiple_lines_below_first(mock_signature_at_cursor: M
         ' # nowrap end comment',
     ])
 
+def test_nowrap_wrap_args_multiple_lines_below_first_extra_line(
+        mock_signature_at_cursor: Mock) -> None:
+    buffer = VimBufferMock([
+        ' # nowrap begin comment',
+        '    def nowrap_func():',
+        '        nowrap_method(',
+        '            nowrap_a,',
+        '            nowrap_b,',
+        '            nowrap_c,',
+        '        )',
+        ' # nowrap end comment',
+    ])
+    mock_signature_at_cursor(_build_signature(RowsRange(2, 6, 8)))
+    wrapper_nowrap.ArgWrapperNoWrap(4).wrap_args((5, 0), buffer)
+    assert_buffer(buffer, [
+        ' # nowrap begin comment',
+        '    def nowrap_func():',
+        '        nowrap_method(nowrap_a, nowrap_b, nowrap_c)',
+        ' # nowrap end comment',
+    ])
+
 def test_nowrap_recognizes_nowrap(mock_signature_at_cursor: Mock) -> None:
     mock_signature_at_cursor(_build_signature(RowsRange(2, 2, 8)))
     assert wrapper_nowrap.ArgWrapperNoWrap(4).recognized((0, 0), VimBufferMock([])) is True

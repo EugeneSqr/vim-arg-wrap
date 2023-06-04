@@ -81,6 +81,27 @@ def test_a_wrap_args_multiple_lines_below_first(mock_signature_at_cursor: Mock) 
         ' # a end comment',
     ])
 
+def test_a_wrap_args_multiple_lines_below_first_extra_line(mock_signature_at_cursor: Mock) -> None:
+    buffer = VimBufferMock([
+        ' # a begin comment',
+        '    def a_func():',
+        '        a_method(',
+        '            a_a,',
+        '            a_b,',
+        '            a_c,',
+        '        )',
+        ' # a end comment',
+    ])
+    mock_signature_at_cursor(_build_signature(RowsRange(2, 6, 8)))
+    wrapper_a.ArgWrapperA(4).wrap_args((5, 0), buffer)
+    assert_buffer(buffer, [
+        ' # a begin comment',
+        '    def a_func():',
+        '        a_method(',
+        '            a_a, a_b, a_c)',
+        ' # a end comment',
+    ])
+
 def test_a_recognizes_a(mock_signature_at_cursor: Mock) -> None:
     mock_signature_at_cursor(_build_signature(RowsRange(0, 1, 0), 'a_method('))
     buffer = VimBufferMock([

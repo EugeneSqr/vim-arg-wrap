@@ -267,6 +267,22 @@ def test_nested_invocations_with_square_brackets(cursor: VimCursor, arrange: Moc
         _assert_equal(buffer_parser.signature_at_cursor(cursor, buffer),
                       Signature(RowsRange(0, 3, 0), 'test(', expected_args, ')'))
 
+def test_type_annotations(arrange: Mock) -> None:
+    '''
+    GIVEN function invocation occupies single line
+    AND typing annotations are in place, but incomplete
+    AND cursor position is inside brackets
+    WHEN parsing the buffer range
+    THEN the data is extracted correctly
+    '''
+    buffer = VimBufferMock(['this_is_test_function(a: int, b, c: Dict[str, str], d) -> List[int]'])
+    rows_range = RowsRange(0, 0, 0)
+    expected_args = ('a: int', 'b', 'c: Dict[str, str]', 'd')
+    with arrange.parse_args_line('a: int, b, c: Dict[str, str], d', expected_args):
+        _assert_equal(
+            buffer_parser.signature_at_cursor((1, 23), buffer),
+            Signature(rows_range, 'this_is_test_function(', expected_args, ') -> List[int]'))
+
 def _assert_equal(actual: Signature, expected: Signature) -> None:
     assert actual == expected
 

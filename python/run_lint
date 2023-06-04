@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
-typing=false
+typing=true
 for i in "$@"; do
     case $i in
-        --typing)
-        typing=true
+        --no-typing)
+        typing=false
         shift
         ;;
     esac

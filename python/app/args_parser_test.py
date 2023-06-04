@@ -19,3 +19,7 @@ def test_parse_args_line_nested_calls_single_bracket_type_returns_args() -> None
 def test_parse_args_line_nested_calls_multiple_bracket_types_returns_args() -> None:
     assert (args_parser.parse_args_line('l1([1,2,3,], {"a": [3,6,7],}), l2[5], {}, []') ==
             ('l1([1,2,3,], {"a": [3,6,7],})', 'l2[5]', '{}', '[]'))
+
+def test_parse_args_line_with_type_annotations() -> None:
+    assert (args_parser.parse_args_line('a: str, b=0, c: Tuple[int, ...], d') ==
+            ('a: str', 'b=0', 'c: Tuple[int, ...]', 'd'))

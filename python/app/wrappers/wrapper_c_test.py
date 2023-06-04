@@ -85,6 +85,28 @@ def test_c_wrap_args_multiple_lines_below_first(mock_signature_at_cursor: Mock) 
         ' # c end comment',
     ])
 
+def test_c_wrap_args_multiple_lines_below_first_extra_line(mock_signature_at_cursor: Mock) -> None:
+    buffer = VimBufferMock([
+        ' # c begin comment',
+        '    def c_func():',
+        '        c_method(',
+        '            c_a,',
+        '            c_b,',
+        '            c_c,',
+        '        )',
+        ' # c end comment',
+    ])
+    mock_signature_at_cursor(_build_signature(RowsRange(2, 6, 8)))
+    wrapper_c.ArgWrapperC(0).wrap_args((5, 0), buffer)
+    assert_buffer(buffer, [
+        ' # c begin comment',
+        '    def c_func():',
+        '        c_method(c_a,',
+        '                 c_b,',
+        '                 c_c)',
+        ' # c end comment',
+    ])
+
 def test_c_recognizes_c(mock_signature_at_cursor: Mock) -> None:
     mock_signature_at_cursor(_build_signature(RowsRange(2, 4, 0)))
     assert wrapper_c.ArgWrapperC(4).recognized((0, 0), VimBufferMock([])) is True
