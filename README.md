@@ -53,12 +53,12 @@ call vundle#end()
 then launch `vim` and run `:PluginInstall`
 
 ## Dependencies
-Python 3.7
+Python 3.8
 
 ## Dev environment setup
 Navigate to the directory where the plugin is installed for example: `~/.vim/bundle/vim-arg-wrap`. Find the `python` subfolder there, `cd` to it. Initialize virtual environment (if needed) and work with the code as usual:
 ```bash
-python3.7 -m venv env
+python3.8 -m venv env
 . env/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt

@@ -1,5 +1,5 @@
 from typing import Optional, Tuple
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from app.types import VimCursor, VimBuffer
 from .args_parser import parse_args_line
@@ -12,7 +12,7 @@ class RowsRange:
 
 @dataclass
 class Signature:
-    rows: RowsRange = RowsRange()
+    rows: RowsRange = field(default_factory=RowsRange)
     beginning: str = ""
     args: Tuple[str, ...] = ()
     ending: str = ""
